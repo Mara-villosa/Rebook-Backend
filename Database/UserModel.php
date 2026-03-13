@@ -1,7 +1,21 @@
 <?php
 require_once 'databaseConfig.php';
 require_once(dirname(dirname(__FILE__)) . '/Database/DataClasses/User.php');
+
+/**
+ * Modelo para realizar operaciones con la tabla users en la base de datos. 
+ * Permite operaciones para el registro e inicio de sesión de usuarios. 
+ */
 class UserModel{
+    /**
+     * Devuelve un objeto de conexión a la base de datos MySQLi.
+     * Devuelve null si no se puede conectar.
+     * @param string $server servidor de la base de datos
+     * @param string $database nombre de la base de datos
+     * @param string $user usuario de conexión
+     * @param string $password contraseña de conexión
+     * @return mysqli|null
+     */
     private function connect(string $server, string $database, string $user, string $password)
     {
         $mysqli = new mysqli($server, $user, $password, $database);
@@ -11,10 +25,6 @@ class UserModel{
         }
 
         return $mysqli;
-    }
-
-    private function disconnect(mysqli $connection){
-        $connection->close();
     }
 
     /**
@@ -47,7 +57,6 @@ class UserModel{
 
         //Si la contraseña no coincide se devuelve null
         if(!password_verify($password, $result['password'])){
-            echo 'aqui';
             $query_result->free();
             $connection->autocommit(true);
             return null;
@@ -63,8 +72,7 @@ class UserModel{
         $query_result->free();
         $connection->commit();
         $connection->autocommit(true);
-
-        $this->disconnect($connection);
+        $connection->close();
 
         return $user;
     }
@@ -79,6 +87,13 @@ class UserModel{
      */
     function signUpUser(string $name, string $email, string $password){
         $connection = $this->connect(SERVER, DATABASE, USER, PASSWORD);
+
+        //Se cancela si hay un error de conexión
+        if ($connection->error) {
+            $connection->close();
+            return false;
+        }
+
         $connection->autocommit(false);
         $connection->begin_transaction();
        
@@ -96,19 +111,11 @@ class UserModel{
             $connection->rollback();
             $connection->autocommit(true);
             return false;
-        }
-        
-        //Se cancela si hay un error de conexión
-        if ($connection->error) {
-            $connection->rollback();
-            $connection->autocommit(true);
-            return false;
-        }
+        }        
 
         $connection->commit();
         $connection->autocommit(true);
-
-        $this->disconnect($connection);
+        $connection->close();
 
         return true;
     }

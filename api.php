@@ -9,11 +9,15 @@ require_once('./API/refresh.php');
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $request = explode( 'api.php', $uri )[1];
 
-$public_uri = array("/login", "/signup"); //Necesitan una x-api-key válida
-$private_uri = array("/refresh"); //Necesitan una cabecera Authorization: Bearer JWT válida
+//Necesitan una cabecera x-api-key válida
+$public_uri = array("/login", "/signup", "/refresh");
+
+//Necesitan una cabecera Authorization: Bearer JWT válida
+$private_uri = array(""); 
 
 //Llamadas públicas a la API (no necesitan autenticación)
 if(in_array($request, $public_uri)){
+    //Si la llamada no es válida se devuelve 400 bad request
     if(checkValidPublicAPICall()){
         switch($request){
             case '/login': 
@@ -22,29 +26,35 @@ if(in_array($request, $public_uri)){
             case '/signup':
                 signup();
                 break;
-            }
-    }
-    else returnBadRequest();
-}
-//Llamadas privadas a la API (necesitan autenticación)
-else if(in_array($request, $private_uri)){
-    if(checkValidPrivateAPICall()){
-        switch($request){
             case '/refresh': 
                 refresh();
                 break;
             }
     }
-    else returnBadRequest();
-    
-    
-}
-//Cualquier otra ruta devuelve error Bad Request
-else{
-    returnBadRequest();
+    else returnHTTPError("Invalid api key", 401);
 }
 
-function returnBadRequest(){
-    http_response_code(400); exit;
+//Llamadas privadas a la API (necesitan autenticación)
+else if(in_array($request, $private_uri)){
+    //Si la llamada no es válida se devuelve 400 bad request
+    if(checkValidPrivateAPICall()){
+        switch($request){
+            }
+    }
+    else returnHTTPError("Invalid access token", 401);    
+}
+//Cualquier otra ruta devuelve 404 Not Found
+else returnHTTPError('Page not Found', 404);
+
+
+/**
+ * Devuelve un mensaje de error y un código de error y finaliza el programa
+ */
+function returnHTTPError(string $errorMessage, int $errorCode){
+    $response = array('message' => $errorMessage);
+    http_response_code($errorCode);
+    header('Content-Type: application/json');
+    echo json_encode($response);
+    exit;
 }
 ?>

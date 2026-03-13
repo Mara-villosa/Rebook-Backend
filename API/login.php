@@ -2,21 +2,25 @@
 require_once(dirname(dirname(__FILE__)) . '/Database/UserModel.php');
 /**
  * Endpoint /login
- * Trata de iniciar sesión con un email y contraseña pasados por POST (form-data).
+ * Trata de iniciar sesión con un email y password pasados en el request body en JSON
  * Si se puede iniciar sesión devuelve 2000OK, los datos del usuario y su access y refresh tokens
  * Si no puede, devuelve 400 bad request
- * @return never
  */
 function login(){
-    if(!isset($_POST['email'])) returnBadRequest();
-    if(!isset($_POST['password'])) returnBadRequest();
+    //Se recupera el body de la request en formato JSON
+    $inputJSON = file_get_contents('php://input');
+    $loginData = json_decode($inputJSON, TRUE);
+
+    //Bad request si faltan campos
+    if(!isset($loginData['email'])) returnHTTPError('Email not provided', 400);
+    if(!isset($loginData['password'])) returnHTTPError('Passwot not provided', 400);
 
     $model = new UserModel();
 
-    $user = $model->logInUser($_POST['email'], $_POST['password']);
+    $user = $model->logInUser($loginData['email'], password: $loginData['password']);
 
     if(!isset($user)){
-        returnBadRequest();
+        returnHTTPError('User not found', 404);
     }
     else{
         http_response_code(200);
