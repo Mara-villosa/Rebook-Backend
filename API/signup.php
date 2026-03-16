@@ -22,6 +22,8 @@ function signup(){
     if($inserted){
         //Se devuelve 201 Created
         http_response_code(201);
+        $response = array('message' => "User Created");
+        echo json_encode($response);
         exit;
     }
     else{
