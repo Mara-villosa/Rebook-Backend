@@ -5,20 +5,9 @@ require_once('./API/checkHeaders.php');
 require_once('./API/login.php');
 require_once('./API/signup.php');
 require_once('./API/refresh.php');
+require_once('./API/CORS.php');
 
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: HEAD, GET, POST, PUT, PATCH, DELETE, OPTIONS");
-header("Vary: Origin");
-header("Access-Control-Allow-Credentials: true");
-header('Content-Type: application/json');
-header("Access-Control-Allow-Headers: X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Request-Method,Access-Control-Request-Headers, Authorization");
-
-// Handle preflight
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    header("Access-Control-Max-Age: 86400");
-    http_response_code(204);
-    exit(0);
-}
+handleCORS();
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $request = explode( 'api.php', $uri )[1];
