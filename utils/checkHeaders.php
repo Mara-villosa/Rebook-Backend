@@ -1,5 +1,5 @@
 <?php
-require_once('./API/JWT.php');
+require_once(ROOT . '/utils/JWT.php');
 
 //API Key del servidor para llamadas públicas
 const api_key = "d6o06RFU8bwKUGftmVQ2Caj9OHarGZdN";

@@ -1,8 +1,6 @@
 <?php
-require_once('Database/databaseConfig.php');
-require_once('Database//DTOs/UserDTO.php');
-
-
+require_once(ROOT . '/database/databaseConfig.php');
+require_once(ROOT . '/database/DTOs/UserDTO.php');
 /**
  * Modelo para realizar operaciones con la tabla users en la base de datos. 
  * Permite operaciones para el registro e inicio de sesión de usuarios. 

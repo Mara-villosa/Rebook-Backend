@@ -1,12 +1,13 @@
-
 <?php
+define('ROOT', $_SERVER['DOCUMENT_ROOT'] . '/Rebook-Backend');
+
 require 'vendor/autoload.php';
-require_once('./API/checkHeaders.php');
-require_once('./API/login.php');
-require_once('./API/signup.php');
-require_once('./API/refresh.php');
-require_once('./API/CORS.php');
-require_once('./API/user/patcthUser.php');
+require_once(ROOT . '/utils/checkHeaders.php');
+require_once(ROOT . '/utils/CORS.php');
+require_once(ROOT . '/controllers/token/refresh.php');
+require_once(ROOT . '/controllers/user/login.php');
+require_once(ROOT . '/controllers/user/signup.php');
+require_once(ROOT. '/controllers/user/patcthUser.php');
 
 handleCORS();
 

@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(dirname(__FILE__)) . '/Database/Models/UserModel.php');
+require_once(ROOT . '/database/models/UserModel.php');
 /**
  * Endpoint /signup
  * Inserta un usuario dado su name, email, password, lastname, id_document, birthday, city, address, postal_code y phone.

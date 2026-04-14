@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(dirname(__FILE__)) . '/Database/Models/UserModel.php');
+require_once(ROOT . '/database/models/UserModel.php');
 /**
  * Endpoint /login
  * Trata de iniciar sesión con un email y password pasados en el request body en JSON

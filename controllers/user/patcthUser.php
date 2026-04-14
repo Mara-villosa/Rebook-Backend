@@ -1,4 +1,5 @@
 <?php 
+require_once(ROOT . '/database/models/UserModel.php');
 /**
  * Actualiza los datos del usuario con sesión iniciada en la aplicación. Puede recibir como parámetros:
  * name, lastname, email, oldPassword, newPassword, id_Document, birthday, city, address, postal_code,
