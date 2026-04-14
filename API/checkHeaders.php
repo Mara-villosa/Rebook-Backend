@@ -35,4 +35,17 @@ const api_key = "d6o06RFU8bwKUGftmVQ2Caj9OHarGZdN";
         }
         return false;
     }
+
+    function getUserID(): int{
+        foreach (getallheaders() as $name => $value) {
+            if($name === 'Authorization'){
+                //La cabecera tiene formato 'Bearer tokenJWT'
+                //Se separa el tokenJWT y se comprueba su validez
+                $token = explode(' ', $value)[1];
+                $tokenDecoded = getTokenDecoded($token);
+                return $tokenDecoded->id;
+            }
+        }
+        return -1;
+    }
 ?>

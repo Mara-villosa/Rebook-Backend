@@ -6,6 +6,7 @@ require_once('./API/login.php');
 require_once('./API/signup.php');
 require_once('./API/refresh.php');
 require_once('./API/CORS.php');
+require_once('./API/user/patcthUser.php');
 
 handleCORS();
 
@@ -16,7 +17,7 @@ $request = explode( 'api.php', $uri )[1];
 $public_uri = array("/login", "/signup", "/refresh");
 
 //Necesitan una cabecera Authorization: Bearer JWT válida
-$private_uri = array(""); 
+$private_uri = array("/user"); 
 
 //Llamadas públicas a la API (no necesitan autenticación)
 if(in_array($request, $public_uri)){
@@ -41,7 +42,11 @@ if(in_array($request, $public_uri)){
 else if(in_array($request, $private_uri)){
     //Si la llamada no es válida se devuelve 400 bad request
     if(checkValidPrivateAPICall()){
+        $userID = getUserID();
         switch($request){
+            case '/user': 
+                patchUser($userID);
+                break;
             }
     }
     else returnHTTPError("Invalid access token", 401);    

@@ -3,7 +3,7 @@
  * Representación de los datos de usuario que se recuperan de la base de datos y se pasan por JSON. 
  * La contraseña no se pasa y se almacena cifrada. 
  */
-class User{
+class UserDTO{
     private int $id;
     private string $name;
     private string $email;

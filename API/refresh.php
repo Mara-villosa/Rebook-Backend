@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(dirname(__FILE__)) . '/Database/UserModel.php');
+require_once(dirname(dirname(__FILE__)) . '/Database/Models/UserModel.php');
 
 /**
  * Recibe un refreshToken JWT y, si es válido y no está expirado, devuelve
