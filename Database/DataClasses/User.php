@@ -7,11 +7,36 @@ class User{
     private int $id;
     private string $name;
     private string $email;
+    private string $lastname;
+    private string $id_document;
+    private string $birthday;
+    private string $city;
+    private string $address;
+    private string $postal_code;
+    private string $phone;
 
-    public function __construct(int $id, string $name, string $email){
+    public function __construct(
+        int $id, 
+        string $name, 
+        string $email, 
+        string $lastname, 
+        string $id_document, 
+        string $birthday, 
+        string $city, 
+        string $address, 
+        string $postal_code, 
+        string $phone)
+    {
         $this->id = $id;
         $this->name = $name;
         $this->email = $email;
+        $this->lastname = $lastname;
+        $this->id_document = $id_document;
+        $this->birthday = $birthday;
+        $this->city = $city;
+        $this->address = $address;
+        $this->postal_code = $postal_code;
+        $this->phone = $phone;
     }
 
     //Getters
@@ -19,23 +44,23 @@ class User{
         return $this->id;
     }
 
-    public function getName(): string{
-        return $this->name;
-    }
-
-    public function getEmail(): string{
-        return $this->email;
-    }
-
     /**
-     * Devuelve el nombre e email del usuario en formato JSON
+     * Devuelve el nombre, apellidos, email, DNI, fecha de nacimiento, localidad, dirección,
+     * código postal y número de teléfono del usuario en formato JSON.
      * El ID se devuelve codificado en el JWT para no dar información sobre la base de datos
-     * @return array{email: string, name: string}
+     * @return array{address: string, birthday: string, city: string, email: string, id_document: string, lastname: string, name: string, phone: string, postal_code: string}
      */
     public function jsonSerialize(){
         return [
             'name' => $this->name,
-            'email' => $this->email
+            'email' => $this->email,
+            'lastname' => $this->lastname,
+            'id_document' => $this->id_document,
+            'birthday' => $this->birthday,
+            'city' => $this->city,
+            'address' => $this->address,
+            'postal_code' => $this->postal_code,
+            'phone' => $this->phone            
         ];
     }
 }
