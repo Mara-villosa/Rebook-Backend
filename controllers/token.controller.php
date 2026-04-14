@@ -2,6 +2,7 @@
 require_once(ROOT . '/database/models/UserModel.php');
 
 /**
+ * Endpoint /refresh
  * Recibe un refreshToken JWT y, si es válido y no está expirado, devuelve
  * un access token con expiración en 1 hora. 
  * @return void

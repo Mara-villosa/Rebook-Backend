@@ -4,10 +4,9 @@ define('ROOT', $_SERVER['DOCUMENT_ROOT'] . '/Rebook-Backend');
 require 'vendor/autoload.php';
 require_once(ROOT . '/utils/checkHeaders.php');
 require_once(ROOT . '/utils/CORS.php');
-require_once(ROOT . '/controllers/token/refresh.php');
-require_once(ROOT . '/controllers/user/login.php');
-require_once(ROOT . '/controllers/user/signup.php');
-require_once(ROOT. '/controllers/user/patcthUser.php');
+require_once(ROOT . '/controllers/users.controller.php');
+require_once(ROOT . '/controllers/token.controller.php');
+require_once(ROOT . '/controllers/books.controller.php');
 
 handleCORS();
 
@@ -18,7 +17,7 @@ $request = explode( 'api.php', $uri )[1];
 $public_uri = array("/login", "/signup", "/refresh");
 
 //Necesitan una cabecera Authorization: Bearer JWT válida
-$private_uri = array("/user"); 
+$private_uri = array("/user", "/books/new", "/books/delete", "/books/get", "/books/category", "/books/user"); 
 
 //Llamadas públicas a la API (no necesitan autenticación)
 if(in_array($request, $public_uri)){
@@ -48,13 +47,22 @@ else if(in_array($request, $private_uri)){
             case '/user': 
                 patchUser($userID);
                 break;
+            case '/books/new':
+                break;
+            case '/books/delete':
+                break;
+            case '/books/get':
+                break;
+            case '/books/category':
+                break;
+            case '/books/user':
+                break;
             }
     }
     else returnHTTPError("Invalid access token", 401);    
 }
 //Cualquier otra ruta devuelve 404 Not Found
 else returnHTTPError('Page not Found', 404);
-
 
 /**
  * Devuelve un mensaje de error y un código de error y finaliza el programa
