@@ -25,13 +25,13 @@ if(in_array($request, $public_uri)){
     if(checkValidPublicAPICall()){
         switch($request){
             case '/login': 
-                login();
+                UsersController::login();
                 break;
             case '/signup':
-                signup();
+                UsersController::signup();
                 break;
             case '/refresh': 
-                refresh();
+                TokenController::refresh();
                 break;
             }
     }
@@ -45,17 +45,22 @@ else if(in_array($request, $private_uri)){
         $userID = getUserID();
         switch($request){
             case '/user': 
-                patchUser($userID);
+                UsersController::patchUser($userID);
                 break;
             case '/books/new':
+                BooksController::createBook();
                 break;
             case '/books/delete':
+                BooksController::deleteBook();
                 break;
             case '/books/get':
+                BooksController::getAllBooks();
                 break;
             case '/books/category':
+                BooksController::getAllBooksFromCategory();
                 break;
             case '/books/user':
+                BooksController::getAllBooksFromUser($userID);
                 break;
             }
     }
