@@ -101,7 +101,7 @@ class UserModel{
      * @param string|null $cvv
      * @return bool true si se ha podido insertar
      */
-    function signUpUser(
+    public function signUpUser(
         string $name, 
         string $email, 
         string $password, 
@@ -139,8 +139,6 @@ class UserModel{
             $hashedCardNumber = password_hash($card_number, PASSWORD_DEFAULT);
             $hashedCVV = password_hash($cvv, PASSWORD_DEFAULT);
         }
-
-        //$date = DateTime::createFromFormat('Y-m-d', $birthday);
 
         $query->bind_param('sssssssssssss', $email, $name, $hashedPassword, $lastname, $id_document, $birthday, $city, $address, $postal_code, $phone, $hashedCardName, $hashedCardNumber, $hashedCVV);
 
@@ -246,11 +244,13 @@ class UserModel{
             if(!$this->updateField($connection, $userId, 'cvv', $cvv)) $success = false;;
         }
 
+        $afectedRows = -1;
         //Actualización de contraseña
         if(isset($oldPassword) && isset($newPassword)){
             $query = $connection->prepare('SELECT * FROM users WHERE ID = ?');
             $query->bind_param('i', $userId);
             $query->execute();
+            $afectedRows = $query->affected_rows;
             $query_result = $query->get_result();
             $result = $query_result->fetch_assoc();
 
@@ -275,7 +275,7 @@ class UserModel{
         $connection->commit();
         $connection->autocommit(true);
         $connection->close();
-        return true;
+        return $afectedRows > 0;
     }
 
     private function updateField($connection, $userId, $fieldName, $field): bool{

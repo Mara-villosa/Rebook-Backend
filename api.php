@@ -4,10 +4,9 @@ define('ROOT', $_SERVER['DOCUMENT_ROOT'] . '/Rebook-Backend');
 require 'vendor/autoload.php';
 require_once(ROOT . '/utils/checkHeaders.php');
 require_once(ROOT . '/utils/CORS.php');
-require_once(ROOT . '/controllers/token/refresh.php');
-require_once(ROOT . '/controllers/user/login.php');
-require_once(ROOT . '/controllers/user/signup.php');
-require_once(ROOT. '/controllers/user/patcthUser.php');
+require_once(ROOT . '/controllers/users.controller.php');
+require_once(ROOT . '/controllers/token.controller.php');
+require_once(ROOT . '/controllers/books.controller.php');
 
 handleCORS();
 
@@ -18,7 +17,7 @@ $request = explode( 'api.php', $uri )[1];
 $public_uri = array("/login", "/signup", "/refresh");
 
 //Necesitan una cabecera Authorization: Bearer JWT válida
-$private_uri = array("/user"); 
+$private_uri = array("/user", "/books/new", "/books/delete", "/books/getAll", "/books/category", "/books/getFromUser", "/books/getBook"); 
 
 //Llamadas públicas a la API (no necesitan autenticación)
 if(in_array($request, $public_uri)){
@@ -26,13 +25,13 @@ if(in_array($request, $public_uri)){
     if(checkValidPublicAPICall()){
         switch($request){
             case '/login': 
-                login();
+                UsersController::login();
                 break;
             case '/signup':
-                signup();
+                UsersController::signup();
                 break;
             case '/refresh': 
-                refresh();
+                TokenController::refresh();
                 break;
             }
     }
@@ -46,7 +45,25 @@ else if(in_array($request, $private_uri)){
         $userID = getUserID();
         switch($request){
             case '/user': 
-                patchUser($userID);
+                UsersController::patchUser($userID);
+                break;
+            case '/books/new':
+                BooksController::uploadBook($userID);
+                break;
+            case '/books/delete':
+                BooksController::deleteBook();
+                break;
+            case '/books/getAll':
+                BooksController::getAllBooks();
+                break;
+            case '/books/category':
+                BooksController::getAllBooksFromCategory();
+                break;
+            case '/books/getFromUser':
+                BooksController::getAllBooksFromUser($userID);
+                break;
+            case '/books/getBook':
+                BooksController::getBookDetails();
                 break;
             }
     }
@@ -54,7 +71,6 @@ else if(in_array($request, $private_uri)){
 }
 //Cualquier otra ruta devuelve 404 Not Found
 else returnHTTPError('Page not Found', 404);
-
 
 /**
  * Devuelve un mensaje de error y un código de error y finaliza el programa
