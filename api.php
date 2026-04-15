@@ -17,7 +17,7 @@ $request = explode( 'api.php', $uri )[1];
 $public_uri = array("/login", "/signup", "/refresh");
 
 //Necesitan una cabecera Authorization: Bearer JWT válida
-$private_uri = array("/user", "/books/new", "/books/delete", "/books/get", "/books/category", "/books/user"); 
+$private_uri = array("/user", "/books/new", "/books/delete", "/books/getAll", "/books/category", "/books/getFromUser", "/books/getBook"); 
 
 //Llamadas públicas a la API (no necesitan autenticación)
 if(in_array($request, $public_uri)){
@@ -48,19 +48,22 @@ else if(in_array($request, $private_uri)){
                 UsersController::patchUser($userID);
                 break;
             case '/books/new':
-                BooksController::uploadBook();
+                BooksController::uploadBook($userID);
                 break;
             case '/books/delete':
                 BooksController::deleteBook();
                 break;
-            case '/books/get':
+            case '/books/getAll':
                 BooksController::getAllBooks();
                 break;
             case '/books/category':
                 BooksController::getAllBooksFromCategory();
                 break;
-            case '/books/user':
+            case '/books/getFromUser':
                 BooksController::getAllBooksFromUser($userID);
+                break;
+            case '/books/getBook':
+                BooksController::getBookDetails();
                 break;
             }
     }

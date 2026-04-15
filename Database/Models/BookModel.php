@@ -39,7 +39,8 @@ class BookModel{
         float $sell_price = -1, 
         string $isbn = "",
         string $url = "",
-        string $category = ""
+        string $category = "",
+        int $userID
         ): bool
     {
         $connection = $this->connect(SERVER, DATABASE, USER, PASSWORD);
@@ -53,11 +54,10 @@ class BookModel{
         $connection->autocommit(false);
         $connection->begin_transaction();
        
-        $query = $connection->prepare('INSERT INTO books (title, author, description, rent_price, sell_price, isbn, url, category, in_cart, rented) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+        $query = $connection->prepare('INSERT INTO books (title, author, description, rent_price, sell_price, isbn, url, category, in_cart, rented, id_user, rent_expired, sold) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
 
-        $inCart = false;
-        $rented = false;
-        $query->bind_param('sssddsssss', $title, $author, $description, $rent_price, $sell_price, $isbn, $url, $category, $inCart, $rented);
+        $inCart = $rented = $rent_expired = $sold = false;
+        $query->bind_param('sssddsssssiss', $title, $author, $description, $rent_price, $sell_price, $isbn, $url, $category, $inCart, $rented, $userID, $rent_expired, $sold);
 
         try{
             $query->execute();
@@ -150,7 +150,10 @@ class BookModel{
                 $result['url'],
                 $result['category'],
                 $result['in_cart'],
-                $result['rented']);
+                $result['rented'], 
+                $result['id_user'],
+                $result['rent_expired'], 
+                $result['sold']);
 
             array_push($books, $book);
         }
@@ -163,11 +166,139 @@ class BookModel{
         return $books;
     }
 
+    /**
+     * Devuelve un array con todos los libros subidos, comprados y alquilados por un usuario
+     * @param int $userID
+     * @return array|null
+     */
     public function getAllBooksFromUser(int $userID){
+        $connection = $this->connect(SERVER, DATABASE, USER, PASSWORD);
+        $connection->autocommit(false);
+        $connection->begin_transaction();
 
+        $result = array('uploads' => [], 'rented' => [], 'bought' => []);
+        $uploads = array();
+
+        //Todos los libros subidos por un usuario
+        $query = $connection->prepare('SELECT * FROM books WHERE id_user = ?');
+        $query->bind_param('i', $userID);
+        $query->execute();
+        $query_result = $query->get_result();
+
+        //Si hay un error o no encuentra el usuario, devuelve null
+        if ($connection->error || $query_result->num_rows === 0) {
+            $query_result->free();
+            $connection->rollback();
+            $connection->autocommit(true);
+            return null;
+        }
+
+        while($result = $query_result->fetch_assoc()){
+            $book = new BookDTO(
+                $result['id'],
+                $result['title'],
+                $result['author'],
+                $result['description'],
+                $result['rent_price'],
+                $result['sell_price'],
+                $result['isbn'],
+                $result['url'],
+                $result['category'],
+                $result['in_cart'],
+                $result['rented'], 
+                $result['id_user'], 
+                $result['rent_expired'], 
+                $result['sold']);
+
+            array_push($uploads, $book);
+        }
+
+        //Todos los libros alquilados por un usuario
+        $rented = array();
+        $query = $connection->prepare('SELECT * FROM books INNER JOIN rented ON books.id=rented.id_book WHERE rented.id_user = ?');
+        $query->bind_param('i', $userID);
+        $query->execute();
+        $query_result = $query->get_result();
+
+        //Si hay un error o no encuentra el usuario, devuelve null
+        if ($connection->error || $query_result->num_rows === 0) {
+            $query_result->free();
+            $connection->rollback();
+            $connection->autocommit(true);
+            return null;
+        }
+
+        while($result = $query_result->fetch_assoc()){
+            $book = new BookDTO(
+                $result['id'],
+                $result['title'],
+                $result['author'],
+                $result['description'],
+                $result['rent_price'],
+                $result['sell_price'],
+                $result['isbn'],
+                $result['url'],
+                $result['category'],
+                $result['in_cart'],
+                $result['rented'], 
+                $result['id_user'], 
+                $result['rent_expired'], 
+                $result['sold']);
+
+            array_push($rented, $book);
+        }
+
+        //Todos los libros comprados
+        $bought = array();
+        $query = $connection->prepare('SELECT * FROM books INNER JOIN bought ON books.id=bought.id_book WHERE bought.id_user = ?');
+        $query->bind_param('i', $userID);
+        $query->execute();
+        $query_result = $query->get_result();
+
+        //Si hay un error o no encuentra el usuario, devuelve null
+        if ($connection->error || $query_result->num_rows === 0) {
+            $query_result->free();
+            $connection->rollback();
+            $connection->autocommit(true);
+            return null;
+        }
+
+        while($result = $query_result->fetch_assoc()){
+            $book = new BookDTO(
+                $result['id'],
+                $result['title'],
+                $result['author'],
+                $result['description'],
+                $result['rent_price'],
+                $result['sell_price'],
+                $result['isbn'],
+                $result['url'],
+                $result['category'],
+                $result['in_cart'],
+                $result['rented'], 
+                $result['id_user'], 
+                $result['rent_expired'], 
+                $result['sold']);
+
+            array_push($bought, $book);
+        }
+        $result['uploads'] = $uploads;
+        $result['rented'] = $rented;
+        $result['bought'] = $bought;
+
+        $query_result->free();
+        $connection->commit();
+        $connection->autocommit(true);
+        $connection->close();
+
+        return $result;
     }
 
     public function getAllBooksByCategory(string $category){
+
+    }
+
+    public function getBookDetails(int $book_id){
 
     }
 }

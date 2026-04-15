@@ -29,7 +29,11 @@ CREATE TABLE books(
     url VARCHAR(250),
     in_cart BOOL,
     rented BOOL,
-    category VARCHAR(50)
+    rent_expired BOOL,
+    sold BOOL,
+    category VARCHAR(50),
+    id_user INT,
+    FOREIGN KEY (id_user) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE rented(
@@ -49,6 +53,14 @@ CREATE TABLE favourites(
 );
 
 CREATE TABLE carts(
+    id_user INT,
+    id_book INT,
+    PRIMARY KEY (id_user, id_book),
+    FOREIGN KEY (id_user) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (id_book) REFERENCES books(id) ON DELETE CASCADE
+);
+
+CREATE TABLE bought(
     id_user INT,
     id_book INT,
     PRIMARY KEY (id_user, id_book),

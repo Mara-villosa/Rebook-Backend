@@ -14,6 +14,9 @@ class BookDTO{
     private string $category;
     private bool $inCart;
     private bool $rented;
+    private bool $rentExpired;
+    private int $userID;
+    private bool $sold;
 
     public function __construct(
         int $id, 
@@ -26,7 +29,10 @@ class BookDTO{
         string $url, 
         string $category,
         bool $inCart, 
-        bool $rented)
+        bool $rented,
+        int $userID,
+        bool $rentExpired,
+        bool $sold)
     {
         $this->id = $id;
         $this->title = $title;
@@ -39,11 +45,9 @@ class BookDTO{
         $this->category = $category;
         $this->inCart = $inCart;
         $this->rented = $rented;
-    }
-
-    //Getters
-    public function getId(){
-        return $this->id;
+        $this->userID = $userID;
+        $this->rentExpired = $rentExpired;
+        $this->sold = $sold;
     }
 
     /**
@@ -62,7 +66,10 @@ class BookDTO{
             'url' => $this->url,
             'category' => $this->category,
             'rented' => $this->rented,
-            'inCart' => $this->inCart        
+            'rent_expired' => $this->rentExpired,
+            'inCart' => $this->inCart,
+            'id_user' => $this->userID,
+            'sold' => $this->sold        
         ];
     }
 }

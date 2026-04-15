@@ -5,7 +5,7 @@ class BooksController{
      * Endpoint /books/new
      * Recibe por POST los datos de un nuevo libro a crear en la base de datos
      */
-    public static function uploadBook(){
+    public static function uploadBook(int $userID){
         //Se recupera el body de la request en formato JSON
         $inputJSON = file_get_contents('php://input');
         $signupData = json_decode($inputJSON, TRUE);
@@ -42,7 +42,8 @@ class BooksController{
             $sell_price, 
             $signupData['isbn'], 
             $signupData['url'],
-            $signupData['category']);
+            $signupData['category'],
+            $userID);
 
         if($created){
             //Se devuelve 201 Created
@@ -85,6 +86,11 @@ class BooksController{
      * Endpoint /books/get
      * Devuelve todos los libros de la base de datos
      */
+    /**
+     * Endpoint /books/user
+     * Recupera todos los libros que ha subido, comprado y alquilado un usuario
+     * @return never
+     */
     public static function getAllBooks(){
         $model = new BookModel();
         $books = $model->getAllBooks();
@@ -103,9 +109,40 @@ class BooksController{
         exit;
     }
     public static function getAllBooksFromUser(string $userID){
+        $model = new BookModel();
+        $books = $model->getAllBooksFromUser($userID);
 
+        if(!isset($books)) returnHTTPError('Books not found', 404);
+
+        http_response_code(200);
+        header('Content-Type: application/json');
+
+        $response = array("uploads" => [], "rented" => [], "bought" => []);
+        $uploads = array();
+        $rented = array();
+        $bought = array();
+        for($i = 0; $i < count($books['uploads']); $i++){
+            array_push($uploads, $books['uploads'][$i]->jsonSerialize());
+        } 
+        for($i = 0; $i < count($books['rented']); $i++){
+            array_push($rented, $books['rented'][$i]->jsonSerialize());
+        } 
+        for($i = 0; $i < count($books['bought']); $i++){
+            array_push($bought, $books['bought'][$i]->jsonSerialize());
+        } 
+
+        $response['uploads'] = $uploads;
+        $response['rented'] = $rented;
+        $response['bought'] = $bought;
+
+        echo json_encode($response);
+        exit;
     }
     public static function getAllBooksFromCategory(){
+
+    }
+
+    public static function getBookDetails(){
 
     }
 }
