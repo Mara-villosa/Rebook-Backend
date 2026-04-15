@@ -50,9 +50,31 @@ class BooksController{
         }
     }
     public static function deleteBook(){
+        //Se recupera el body de la request en formato JSON
+        $inputJSON = file_get_contents('php://input');
+        $signupData = json_decode($inputJSON, TRUE);
 
+        //Bad Request si faltan campos
+        if(!isset($signupData['book_id'])) returnHTTPError('Book ID not provided', 400);
+
+        $model = new BookModel();
+        $deleted = $model->deleteBook($signupData['book_id']);
+
+        if($deleted){
+            http_response_code(200);
+            $response = array('message' => "Book deleted");
+            echo json_encode($response);
+            exit;
+        }
+        else{
+            returnHTTPError('Invalid book data', 400);
+        }
     }
+
+    //Debería devolver para cada libro si está alquilado o no
     public static function getAllBooks(){
+        $model = new BookModel();
+        
 
     }
     public static function getAllBooksFromUser(string $userID){

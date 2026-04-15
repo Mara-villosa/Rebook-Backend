@@ -244,11 +244,13 @@ class UserModel{
             if(!$this->updateField($connection, $userId, 'cvv', $cvv)) $success = false;;
         }
 
+        $afectedRows = -1;
         //Actualización de contraseña
         if(isset($oldPassword) && isset($newPassword)){
             $query = $connection->prepare('SELECT * FROM users WHERE ID = ?');
             $query->bind_param('i', $userId);
             $query->execute();
+            $afectedRows = $query->affected_rows;
             $query_result = $query->get_result();
             $result = $query_result->fetch_assoc();
 
@@ -273,7 +275,7 @@ class UserModel{
         $connection->commit();
         $connection->autocommit(true);
         $connection->close();
-        return true;
+        return $afectedRows > 0;
     }
 
     private function updateField($connection, $userId, $fieldName, $field): bool{

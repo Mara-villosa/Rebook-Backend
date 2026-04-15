@@ -15,10 +15,7 @@ class BookModel{
     {
         $mysqli = new mysqli($server, $user, $password, $database);
 
-        if ($mysqli->connect_error) {
-            return null;
-        }
-
+        if ($mysqli->connect_error)  return null;
         return $mysqli;
     }
 
@@ -78,8 +75,39 @@ class BookModel{
         return true;
     }
 
-    public function deleteBook(){
+    public function deleteBook(int $book_id){
+        $connection = $this->connect(SERVER, DATABASE, USER, PASSWORD);
 
+        //Se cancela si hay un error de conexión
+        if ($connection->error) {
+            $connection->close();
+            return false;
+        }
+
+        $connection->autocommit(false);
+        $connection->begin_transaction();
+       
+        $query = $connection->prepare('DELETE FROM books WHERE ID = ?');
+        $query->bind_param('i', $book_id);
+
+        $affectedRows = -1;
+
+        try{
+            $query->execute();
+            $affectedRows = $query->affected_rows;
+        }
+        //Se cancela si hay un error de inserción
+        catch(Exception $e){
+            $connection->rollback();
+            $connection->autocommit(true);
+            return false;
+        }        
+
+        $connection->commit();
+        $connection->autocommit(true);
+        $connection->close();
+
+        return $affectedRows > 0;
     }
 
     public function getAllBooks(){
