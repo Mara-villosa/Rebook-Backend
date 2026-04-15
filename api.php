@@ -48,7 +48,7 @@ else if(in_array($request, $private_uri)){
                 UsersController::patchUser($userID);
                 break;
             case '/books/new':
-                BooksController::createBook();
+                BooksController::uploadBook();
                 break;
             case '/books/delete':
                 BooksController::deleteBook();

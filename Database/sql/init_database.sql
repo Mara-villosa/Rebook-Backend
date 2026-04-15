@@ -27,6 +27,7 @@ CREATE TABLE books(
     sell_price DECIMAL (10, 2),
     isbn CHAR(13),
     url VARCHAR(250),
+    in_cart BOOL,
     category VARCHAR(50)
 );
 
@@ -34,22 +35,22 @@ CREATE TABLE rented(
     id_user INT,
     id_book INT,
     PRIMARY KEY (id_user, id_book),
-    FOREIGN KEY (id_user) REFERENCES users(id),
-    FOREIGN KEY (id_book) REFERENCES books(id)
+    FOREIGN KEY (id_user) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (id_book) REFERENCES books(id) ON DELETE CASCADE
 );
 
 CREATE TABLE favourites(
     id_user INT,
     id_book INT,
     PRIMARY KEY (id_user, id_book),
-    FOREIGN KEY (id_user) REFERENCES users(id),
-    FOREIGN KEY (id_book) REFERENCES books(id)
+    FOREIGN KEY (id_user) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (id_book) REFERENCES books(id) ON DELETE CASCADE
 );
 
-CREATE TABLE inCart(
+CREATE TABLE carts(
     id_user INT,
     id_book INT,
     PRIMARY KEY (id_user, id_book),
-    FOREIGN KEY (id_user) REFERENCES users(id),
-    FOREIGN KEY (id_book) REFERENCES books(id)
+    FOREIGN KEY (id_user) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (id_book) REFERENCES books(id) ON DELETE CASCADE
 );

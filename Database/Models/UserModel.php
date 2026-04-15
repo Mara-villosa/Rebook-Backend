@@ -101,7 +101,7 @@ class UserModel{
      * @param string|null $cvv
      * @return bool true si se ha podido insertar
      */
-    function signUpUser(
+    public function signUpUser(
         string $name, 
         string $email, 
         string $password, 
@@ -139,8 +139,6 @@ class UserModel{
             $hashedCardNumber = password_hash($card_number, PASSWORD_DEFAULT);
             $hashedCVV = password_hash($cvv, PASSWORD_DEFAULT);
         }
-
-        //$date = DateTime::createFromFormat('Y-m-d', $birthday);
 
         $query->bind_param('sssssssssssss', $email, $name, $hashedPassword, $lastname, $id_document, $birthday, $city, $address, $postal_code, $phone, $hashedCardName, $hashedCardNumber, $hashedCVV);
 
