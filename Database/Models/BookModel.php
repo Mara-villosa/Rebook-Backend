@@ -53,10 +53,11 @@ class BookModel{
         $connection->autocommit(false);
         $connection->begin_transaction();
        
-        $query = $connection->prepare('INSERT INTO books (title, author, description, rent_price, sell_price, isbn, url, in_cart, category) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
+        $query = $connection->prepare('INSERT INTO books (title, author, description, rent_price, sell_price, isbn, url, category, in_cart, rented) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
 
         $inCart = false;
-        $query->bind_param('sssddssss', $title, $author, $description, $rent_price, $sell_price, $isbn, $url, $inCart, $category);
+        $rented = false;
+        $query->bind_param('sssddsssss', $title, $author, $description, $rent_price, $sell_price, $isbn, $url, $category, $inCart, $rented);
 
         try{
             $query->execute();
@@ -75,6 +76,11 @@ class BookModel{
         return true;
     }
 
+    /**
+     * Borrar un libro con id especificada de la base de datos
+     * @param int $book_id
+     * @return bool true si se ha podido borrar
+     */
     public function deleteBook(int $book_id){
         $connection = $this->connect(SERVER, DATABASE, USER, PASSWORD);
 
@@ -110,8 +116,51 @@ class BookModel{
         return $affectedRows > 0;
     }
 
-    public function getAllBooks(){
+    /**
+     * Devuelve un array de BookDTO con todos los libros recuperados de la base de datos
+     * @returns array | null
+     */
+    public function getAllBooks(): array|null{
+        $connection = $this->connect(SERVER, DATABASE, USER, PASSWORD);
+        $connection->autocommit(false);
+        $connection->begin_transaction();
 
+        $query = $connection->prepare('SELECT * FROM books');
+        $query->execute();
+        $query_result = $query->get_result();
+
+        //Si hay un error o no encuentra el usuario, devuelve null
+        if ($connection->error || $query_result->num_rows === 0) {
+            $query_result->free();
+            $connection->rollback();
+            $connection->autocommit(true);
+            return null;
+        }
+
+        $books = array();
+        while($result = $query_result->fetch_assoc()){
+            $book = new BookDTO(
+                $result['id'],
+                $result['title'],
+                $result['author'],
+                $result['description'],
+                $result['rent_price'],
+                $result['sell_price'],
+                $result['isbn'],
+                $result['url'],
+                $result['category'],
+                $result['in_cart'],
+                $result['rented']);
+
+            array_push($books, $book);
+        }
+
+        $query_result->free();
+        $connection->commit();
+        $connection->autocommit(true);
+        $connection->close();
+
+        return $books;
     }
 
     public function getAllBooksFromUser(int $userID){

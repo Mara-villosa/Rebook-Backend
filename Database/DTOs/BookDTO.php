@@ -6,30 +6,39 @@ class BookDTO{
     private int $id;
     private string $title;
     private string $author;
+    private string $description;
     private float $rentPrice;
     private float $sellPrice;
     private string $isbn;
     private string $url;
     private string $category;
+    private bool $inCart;
+    private bool $rented;
 
     public function __construct(
         int $id, 
         string $title, 
         string $author, 
+        string $description,
         float $rentPrice, 
         float $sellPrice, 
         string $isbn, 
         string $url, 
-        string $category)
+        string $category,
+        bool $inCart, 
+        bool $rented)
     {
         $this->id = $id;
         $this->title = $title;
         $this->author = $author;
+        $this->description = $description;
         $this->rentPrice = $rentPrice;
         $this->sellPrice = $sellPrice;
         $this->isbn = $isbn;
         $this->url = $url;
         $this->category = $category;
+        $this->inCart = $inCart;
+        $this->rented = $rented;
     }
 
     //Getters
@@ -46,11 +55,14 @@ class BookDTO{
             'id' => $this->id,
             'title' => $this->title,
             'author' => $this->author,
+            'description' => $this->description,
             'rentPrice' => $this->rentPrice,
             'sellPrice' => $this->sellPrice,
             'isbn' => $this->isbn,
             'url' => $this->url,
-            'category' => $this->category        
+            'category' => $this->category,
+            'rented' => $this->rented,
+            'inCart' => $this->inCart        
         ];
     }
 }

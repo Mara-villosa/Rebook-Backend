@@ -21,11 +21,17 @@ class BooksController{
         if(!isset($signupData['rent_price']) && !isset($signupData['sell_price'])) 
             returnHTTPError('Rent or Sell price must be provided', 400);
 
-        isset($signupData['rent_price']) ? $rent_price = $signupData['rent_price'] : $rent_price = -1;
-        if($rent_price <= 0) returnHTTPError('Rent price must be higher than 0', 400);
-
-        isset($signupData['sell_price']) ? $sell_price = $signupData['sell_price'] : $sell_price = -1;
-        if($sell_price <= 0) returnHTTPError('Sell price must be higher than 0', 400);
+        $rent_price = -1;
+        if(isset($signupData['rent_price'])){
+            $rent_price = $signupData['rent_price'];
+            if($rent_price <= 0) returnHTTPError('Rent price must be higher than 0', 400);
+        }
+        
+        $sell_price = -1;
+        if(isset($signupData['sell_price'])){
+            $sell_price = $signupData['sell_price'];
+            if($sell_price <= 0) returnHTTPError('Sell price must be higher than 0', 400);
+        }
 
         $model = new BookModel();
         $created = $model->createBook(
@@ -49,6 +55,10 @@ class BooksController{
             returnHTTPError('Invalid book data', 400);
         }
     }
+    /**
+     * Endpoint /books/delete
+     * Borrar un libro de la base de datos con una id especificada
+     */
     public static function deleteBook(){
         //Se recupera el body de la request en formato JSON
         $inputJSON = file_get_contents('php://input');
@@ -71,11 +81,26 @@ class BooksController{
         }
     }
 
-    //Debería devolver para cada libro si está alquilado o no
+    /**
+     * Endpoint /books/get
+     * Devuelve todos los libros de la base de datos
+     */
     public static function getAllBooks(){
         $model = new BookModel();
-        
+        $books = $model->getAllBooks();
 
+        if(!isset($books)) returnHTTPError('Books not found', 404);
+
+        http_response_code(200);
+        header('Content-Type: application/json');
+
+        $response = array("books" => []);
+        for($i = 0; $i < count($books); $i++){
+            array_push($response['books'], $books[$i]->jsonSerialize());
+        } 
+
+        echo json_encode($response);
+        exit;
     }
     public static function getAllBooksFromUser(string $userID){
 

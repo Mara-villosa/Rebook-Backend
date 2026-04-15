@@ -28,6 +28,7 @@ CREATE TABLE books(
     isbn CHAR(13),
     url VARCHAR(250),
     in_cart BOOL,
+    rented BOOL,
     category VARCHAR(50)
 );
 
