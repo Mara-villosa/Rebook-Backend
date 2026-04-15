@@ -39,6 +39,7 @@ CREATE TABLE books(
 CREATE TABLE rented(
     id_user INT,
     id_book INT,
+    rented_on DATE,
     PRIMARY KEY (id_user, id_book),
     FOREIGN KEY (id_user) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (id_book) REFERENCES books(id) ON DELETE CASCADE

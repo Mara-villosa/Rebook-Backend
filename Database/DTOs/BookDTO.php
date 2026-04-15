@@ -42,7 +42,7 @@ class BookDTO{
         $this->sellPrice = $sellPrice;
         $this->isbn = $isbn;
         $this->url = $url;
-        $this->category = $category;
+        $this->category = strtolower($category);
         $this->inCart = $inCart;
         $this->rented = $rented;
         $this->userID = $userID;

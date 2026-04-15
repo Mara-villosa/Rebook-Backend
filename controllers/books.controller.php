@@ -83,13 +83,12 @@ class BooksController{
     }
 
     /**
-     * Endpoint /books/get
+     * Endpoint /books/getAll
      * Devuelve todos los libros de la base de datos
      */
     /**
      * Endpoint /books/user
      * Recupera todos los libros que ha subido, comprado y alquilado un usuario
-     * @return never
      */
     public static function getAllBooks(){
         $model = new BookModel();
@@ -108,6 +107,12 @@ class BooksController{
         echo json_encode($response);
         exit;
     }
+
+    /**
+     * Endpoint /books/getFromUser
+     * Devuelve un array con todos los libros comprados, subidos y alquilados por un usuario
+     * @param string $userID usuario que hace la petición
+     */
     public static function getAllBooksFromUser(string $userID){
         $model = new BookModel();
         $books = $model->getAllBooksFromUser($userID);
@@ -118,6 +123,7 @@ class BooksController{
         header('Content-Type: application/json');
 
         $response = array("uploads" => [], "rented" => [], "bought" => []);
+
         $uploads = array();
         $rented = array();
         $bought = array();
@@ -138,12 +144,58 @@ class BooksController{
         echo json_encode($response);
         exit;
     }
+    /**
+     * Endpoint /books/category
+     * Devuelve un array con todos los libros de una categoría
+     */
     public static function getAllBooksFromCategory(){
+        //Se recupera el body de la request en formato JSON
+        $inputJSON = file_get_contents('php://input');
+        $signupData = json_decode($inputJSON, TRUE);
 
+        //Bad Request si faltan campos
+        if(!isset($signupData['category'])) returnHTTPError('Category not provided', 400);
+
+        $model = new BookModel();
+        $books = $model->getAllBooksByCategory($signupData['category']);
+
+        if(!isset($books)) returnHTTPError('Books not found', 404);
+
+        http_response_code(200);
+        header('Content-Type: application/json');
+
+        $response = array("books" => []);
+        for($i = 0; $i < count($books); $i++){
+            array_push($response['books'], $books[$i]->jsonSerialize());
+        } 
+
+        echo json_encode($response);
+        exit;       
     }
 
+    /**
+     * Endpoint /books/getBook
+     * Devuelve los datos de un libro en concreto
+     */
     public static function getBookDetails(){
+        //Se recupera el body de la request en formato JSON
+        $inputJSON = file_get_contents('php://input');
+        $signupData = json_decode($inputJSON, TRUE);
 
+        //Bad Request si faltan campos
+        if(!isset($signupData['book_id'])) returnHTTPError('Book ID not provided', 400);
+
+        $model = new BookModel();
+        $book = $model->getBookDetails($signupData['book_id']);
+
+        if(!isset($book)) returnHTTPError('Books not found', 404);
+
+        http_response_code(200);
+        header('Content-Type: application/json');
+
+        $response = $book->jsonSerialize();
+        echo json_encode($response);
+        exit;
     }
 }
 ?>

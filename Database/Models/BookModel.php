@@ -11,10 +11,8 @@ class BookModel{
      * @param string $password contraseña de conexión
      * @return mysqli|null
      */
-    private function connect(string $server, string $database, string $user, string $password)
-    {
+    private function connect(string $server, string $database, string $user, string $password){
         $mysqli = new mysqli($server, $user, $password, $database);
-
         if ($mysqli->connect_error)  return null;
         return $mysqli;
     }
@@ -57,6 +55,7 @@ class BookModel{
         $query = $connection->prepare('INSERT INTO books (title, author, description, rent_price, sell_price, isbn, url, category, in_cart, rented, id_user, rent_expired, sold) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
 
         $inCart = $rented = $rent_expired = $sold = false;
+        $category = strtolower($category);
         $query->bind_param('sssddsssssiss', $title, $author, $description, $rent_price, $sell_price, $isbn, $url, $category, $inCart, $rented, $userID, $rent_expired, $sold);
 
         try{
@@ -294,12 +293,109 @@ class BookModel{
         return $result;
     }
 
+    /**
+     * Devuelve un array con todos los libros de una categoría
+     * @param string $category categoría a buscar
+     */
     public function getAllBooksByCategory(string $category){
+        $connection = $this->connect(SERVER, DATABASE, USER, PASSWORD);
+        $connection->autocommit(false);
+        $connection->begin_transaction();
 
+        $query = $connection->prepare('SELECT * FROM books WHERE category = ?');
+        $query->bind_param('s', $category);
+        $query->execute();
+        $query_result = $query->get_result();
+
+        //Si hay un error o no encuentra el usuario, devuelve null
+        if ($connection->error || $query_result->num_rows === 0) {
+            $query_result->free();
+            $connection->rollback();
+            $connection->autocommit(true);
+            return null;
+        }
+
+        $books = array();
+        while($result = $query_result->fetch_assoc()){
+            $book = new BookDTO(
+                $result['id'],
+                $result['title'],
+                $result['author'],
+                $result['description'],
+                $result['rent_price'],
+                $result['sell_price'],
+                $result['isbn'],
+                $result['url'],
+                $result['category'],
+                $result['in_cart'],
+                $result['rented'], 
+                $result['id_user'],
+                $result['rent_expired'], 
+                $result['sold']);
+
+            array_push($books, $book);
+        }
+
+        $query_result->free();
+        $connection->commit();
+        $connection->autocommit(true);
+        $connection->close();
+
+        return $books;
     }
 
+    /**
+     * Devuelve los datos de un libro en concreto
+     * @param int $book_id id del libro a buscar
+     */
     public function getBookDetails(int $book_id){
+        $connection = $this->connect(SERVER, DATABASE, USER, PASSWORD);
+        $connection->autocommit(false);
+        $connection->begin_transaction();
 
+        $query = $connection->prepare('SELECT * FROM books WHERE id = ?');
+        $query->bind_param('i', $book_id);
+        $query->execute();
+        $query_result = $query->get_result();
+
+        //Si hay un error o no encuentra el usuario, devuelve null
+        if ($connection->error || $query_result->num_rows === 0) {
+            $query_result->free();
+            $connection->rollback();
+            $connection->autocommit(true);
+            return null;
+        }
+
+        $result = $query_result->fetch_assoc();
+
+        if(!isset($result)){
+            $query_result->free();
+            $connection->autocommit(true);
+            return null;
+        }
+
+        $book = new BookDTO(
+            $result['id'],
+            $result['title'],
+            $result['author'],
+            $result['description'],
+            $result['rent_price'],
+            $result['sell_price'],
+            $result['isbn'],
+            $result['url'],
+            $result['category'],
+            $result['in_cart'],
+            $result['rented'], 
+            $result['id_user'],
+            $result['rent_expired'], 
+            $result['sold']);
+
+        $query_result->free();
+        $connection->commit();
+        $connection->autocommit(true);
+        $connection->close();
+
+        return $book;
     }
 }
 ?>
