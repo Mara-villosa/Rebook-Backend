@@ -16,9 +16,9 @@ class TokenController{
         $refreshToken = $refreshData['refreshToken'];
 
         //Si el refreshToken no está expirado y es válido se devuelve un accessToken refrescado
-        if(checkValidToken($refreshToken)){
-            $refreshTokenDecoded = getTokenDecoded($refreshToken);
-            $newAccessToken = createAccessToken($refreshTokenDecoded->id);
+        if(JWTUtils::checkValidToken($refreshToken)){
+            $refreshTokenDecoded = JWTUtils::getTokenDecoded($refreshToken);
+            $newAccessToken = JWTUtils::createAccessToken($refreshTokenDecoded->id);
 
             $response = array('accessToken' => $newAccessToken, 'refreshToken' => $refreshToken);
             

@@ -8,7 +8,7 @@ require_once(ROOT . '/controllers/users.controller.php');
 require_once(ROOT . '/controllers/token.controller.php');
 require_once(ROOT . '/controllers/books.controller.php');
 
-handleCORS();
+CORSUtils::handleCORS();
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $request = explode( 'api.php', $uri )[1];
@@ -22,7 +22,7 @@ $private_uri = array("/user", "/books/new", "/books/delete", "/books/getAll", "/
 //Llamadas públicas a la API (no necesitan autenticación)
 if(in_array($request, $public_uri)){
     //Si la llamada no es válida se devuelve 400 bad request
-    if(checkValidPublicAPICall()){
+    if(HeaderUtils::checkValidPublicAPICall()){
         switch($request){
             case '/login': 
                 UsersController::login();
@@ -41,8 +41,8 @@ if(in_array($request, $public_uri)){
 //Llamadas privadas a la API (necesitan autenticación)
 else if(in_array($request, $private_uri)){
     //Si la llamada no es válida se devuelve 400 bad request
-    if(checkValidPrivateAPICall()){
-        $userID = getUserID();
+    if(HeaderUtils::checkValidPrivateAPICall()){
+        $userID = HeaderUtils::getUserID();
         switch($request){
             case '/user': 
                 UsersController::patchUser($userID);

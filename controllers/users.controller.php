@@ -93,8 +93,8 @@ class UsersController{
             http_response_code(200);
             header('Content-Type: application/json');
             
-            $accessToken = createAccessToken($user->getId());
-            $refreshToken = createRefreshToken($user->getId());
+            $accessToken = JWTUtils::createAccessToken($user->getId());
+            $refreshToken = JWTUtils::createRefreshToken($user->getId());
 
             $response = array('userData' => $user->jsonSerialize(), 'accessToken' => $accessToken, 'refreshToken' => $refreshToken);
 
