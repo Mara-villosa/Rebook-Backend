@@ -77,10 +77,10 @@ class BookModel{
 
     /**
      * Borrar un libro con id especificada de la base de datos
-     * @param int $book_id
+     * @param int $book_id, $userID
      * @return bool true si se ha podido borrar
      */
-    public function deleteBook(int $book_id){
+    public function deleteBook(int $book_id, int $userID){
         $connection = $this->connect(SERVER, DATABASE, USER, PASSWORD);
 
         //Se cancela si hay un error de conexión
@@ -92,8 +92,8 @@ class BookModel{
         $connection->autocommit(false);
         $connection->begin_transaction();
        
-        $query = $connection->prepare('DELETE FROM books WHERE ID = ?');
-        $query->bind_param('i', $book_id);
+        $query = $connection->prepare('DELETE FROM books WHERE books.id = ? AND books.id_user = ?');
+        $query->bind_param('ii', $book_id, $userID);
 
         $affectedRows = -1;
 

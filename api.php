@@ -60,7 +60,7 @@ else if(in_array($request, $private_uri)){
                 BooksController::uploadBook($userID);
                 break;
             case '/books/delete':
-                BooksController::deleteBook();
+                BooksController::deleteBook($userID);
                 break;
             case '/books/getFromUser':
                 BooksController::getAllBooksFromUser($userID);

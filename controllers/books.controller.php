@@ -60,7 +60,7 @@ class BooksController{
      * Endpoint /books/delete
      * Borrar un libro de la base de datos con una id especificada
      */
-    public static function deleteBook(){
+    public static function deleteBook(int $userID){
         //Se recupera el body de la request en formato JSON
         $inputJSON = file_get_contents('php://input');
         $signupData = json_decode($inputJSON, TRUE);
@@ -69,7 +69,7 @@ class BooksController{
         if(!isset($signupData['book_id'])) returnHTTPError('Book ID not provided', 400);
 
         $model = new BookModel();
-        $deleted = $model->deleteBook($signupData['book_id']);
+        $deleted = $model->deleteBook($signupData['book_id'], $userID);
 
         if($deleted){
             http_response_code(200);
