@@ -1,5 +1,5 @@
-CREATE DATABASE Rebook;
-USE Rebook;
+CREATE DATABASE rebook;
+USE rebook;
 
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -29,7 +29,6 @@ CREATE TABLE books(
     url VARCHAR(250),
     in_cart BOOL,
     rented BOOL,
-    rent_expired BOOL,
     rent_expiration_date DATE,
     sold BOOL,
     category VARCHAR(50),
@@ -41,6 +40,7 @@ CREATE TABLE rented(
     id_user INT,
     id_book INT,
     rented_on DATE,
+    expiration_date DATE,
     PRIMARY KEY (id_user, id_book),
     FOREIGN KEY (id_user) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (id_book) REFERENCES books(id) ON DELETE CASCADE

@@ -10,28 +10,28 @@ class UsersController{
     public static function signup(){
         //Se recupera el body de la request en formato JSON
         $inputJSON = file_get_contents('php://input');
-        $signupData = json_decode($inputJSON, TRUE);
+        $data = json_decode($inputJSON, TRUE);
 
         //Bad Request si faltan campos
-        if(!isset($signupData['name'])) returnHTTPError('Name not provided', 400);
-        if(!isset($signupData['lastname'])) returnHTTPError('Lastname not provided', 400);
-        if(!isset($signupData['email'])) returnHTTPError('Email not provided', 400);
-        if(!isset($signupData['password'])) returnHTTPError('Password not provided', 400);
-        if(!isset($signupData['id_document'])) returnHTTPError('ID Document not provided', 400);
-        if(!isset($signupData['birthday'])) returnHTTPError('Birthday not provided', 400);
-        if(!isset($signupData['city'])) returnHTTPError('City not provided', 400);
-        if(!isset($signupData['address'])) returnHTTPError('Address not provided', 400);
-        if(!isset($signupData['postal_code'])) returnHTTPError('Postal Code not provided', 400);
-        if(!isset($signupData['phone'])) returnHTTPError('Phone not provided', 400);
+        if(!isset($data['name'])) returnHTTPError('Name not provided', 400);
+        if(!isset($data['lastname'])) returnHTTPError('Lastname not provided', 400);
+        if(!isset($data['email'])) returnHTTPError('Email not provided', 400);
+        if(!isset($data['password'])) returnHTTPError('Password not provided', 400);
+        if(!isset($data['id_document'])) returnHTTPError('ID Document not provided', 400);
+        if(!isset($data['birthday'])) returnHTTPError('Birthday not provided', 400);
+        if(!isset($data['city'])) returnHTTPError('City not provided', 400);
+        if(!isset($data['address'])) returnHTTPError('Address not provided', 400);
+        if(!isset($data['postal_code'])) returnHTTPError('Postal Code not provided', 400);
+        if(!isset($data['phone'])) returnHTTPError('Phone not provided', 400);
 
         //Campos opcionales de datos de la tarjeta
         $card_name = null;
         $card_number = null;
         $cvv = null;
-        if(isset($signupData['card_name']) && isset($signupData['card_number']) && isset($signupData['cvv'])){
-            $card_name = $signupData['card_name'];
-            $card_number = $signupData['card_number'];
-            $cvv = $signupData['cvv'];
+        if(isset($data['card_name']) && isset($data['card_number']) && isset($data['cvv'])){
+            $card_name = $data['card_name'];
+            $card_number = $data['card_number'];
+            $cvv = $data['cvv'];
 
             //Validación de datos de la tarjeta
             if(strlen($card_number) !== 16) returnHTTPError('Invalid card number', 400);
@@ -41,16 +41,16 @@ class UsersController{
         $model = new UserModel();
 
         $inserted = $model->signUpUser(
-            $signupData['name'], 
-            $signupData['email'], 
-            $signupData['password'],
-            $signupData['lastname'],
-            $signupData['id_document'], 
-            $signupData['birthday'],
-            $signupData['city'],
-            $signupData['address'],
-            $signupData['postal_code'],
-            $signupData['phone'],
+            $data['name'], 
+            $data['email'], 
+            $data['password'],
+            $data['lastname'],
+            $data['id_document'], 
+            $data['birthday'],
+            $data['city'],
+            $data['address'],
+            $data['postal_code'],
+            $data['phone'],
             $card_name,
             $card_number,
             $cvv);
@@ -76,15 +76,15 @@ class UsersController{
     public static function login(){
         //Se recupera el body de la request en formato JSON
         $inputJSON = file_get_contents('php://input');
-        $loginData = json_decode($inputJSON, TRUE);
+        $data = json_decode($inputJSON, TRUE);
 
         //Bad request si faltan campos
-        if(!isset($loginData['email'])) returnHTTPError('Email not provided', 400);
-        if(!isset($loginData['password'])) returnHTTPError('Passwot not provided', 400);
+        if(!isset($data['email'])) returnHTTPError('Email not provided', 400);
+        if(!isset($data['password'])) returnHTTPError('Passwot not provided', 400);
 
         $model = new UserModel();
 
-        $user = $model->logInUser($loginData['email'], password: $loginData['password']);
+        $user = $model->logInUser($data['email'], password: $data['password']);
 
         if(!isset($user)){
             returnHTTPError('User not found', 404);
@@ -113,35 +113,35 @@ class UsersController{
     public static function patchUser(int $userID){
         //Se recupera el body de la request en formato JSON
         $inputJSON = file_get_contents('php://input');
-        $signupData = json_decode($inputJSON, TRUE);
+        $data = json_decode($inputJSON, TRUE);
 
         $name = $lastname = $email = $oldPassword = $newPassword = $id_document = $birthday = $city = $address = $postal_code = $phone = $card_name = $card_number = $cvv= null;
 
         //Bad Request si faltan campos
-        if(isset($signupData['name'])) $name = $signupData['name'];
-        if(isset($signupData['lastname'])) $lastname = $signupData['lastname'];
-        if(isset($signupData['email'])) $email = $signupData['email'];
+        if(isset($data['name'])) $name = $data['name'];
+        if(isset($data['lastname'])) $lastname = $data['lastname'];
+        if(isset($data['email'])) $email = $data['email'];
 
         //Se deben enviar tanto la contraseña antigua como la nueva en una misma llamada para poder actualizarla
-        if(isset($signupData['oldPassword']) || isset($signupData['newPassword'])){
-            if(!isset($signupData['newPassword']) || !isset($signupData['oldPassword'])){
+        if(isset($data['oldPassword']) || isset($data['newPassword'])){
+            if(!isset($data['newPassword']) || !isset($data['oldPassword'])){
                 returnHTTPError('Old password and new password must both be provided to update password', 400);
             }
             else{
-                $oldPassword = $signupData['oldPassword'];
-                $newPassword = $signupData['newPassword'];
+                $oldPassword = $data['oldPassword'];
+                $newPassword = $data['newPassword'];
             }      
         }
-        if(isset($signupData['newPassword'])) $newPassword = $signupData['newPassword'];
-        if(isset($signupData['id_document'])) $id_document = $signupData['id_document'];
-        if(isset($signupData['birthday'])) $birthday = $signupData['birthday'];
-        if(isset($signupData['city'])) $city = $signupData['city'];
-        if(isset($signupData['address'])) $address = $signupData['address'];
-        if(isset($signupData['postal_code'])) $postal_code = $signupData['postal_code'];
-        if(isset($signupData['phone'])) $phone = $signupData['phone'];
-        if(isset($signupData['card_name'])) $card_name = $signupData['card_name'];
-        if(isset($signupData['card_number'])) $card_number = $signupData['card_number'];
-        if(isset($signupData['cvv'])) $cvv = $signupData['cvv'];
+        if(isset($data['newPassword'])) $newPassword = $data['newPassword'];
+        if(isset($data['id_document'])) $id_document = $data['id_document'];
+        if(isset($data['birthday'])) $birthday = $data['birthday'];
+        if(isset($data['city'])) $city = $data['city'];
+        if(isset($data['address'])) $address = $data['address'];
+        if(isset($data['postal_code'])) $postal_code = $data['postal_code'];
+        if(isset($data['phone'])) $phone = $data['phone'];
+        if(isset($data['card_name'])) $card_name = $data['card_name'];
+        if(isset($data['card_number'])) $card_number = $data['card_number'];
+        if(isset($data['cvv'])) $cvv = $data['cvv'];
 
         $model = new UserModel();
         $updated = $model->updateUser(
