@@ -30,6 +30,7 @@ CREATE TABLE books(
     in_cart BOOL,
     rented BOOL,
     rent_expired BOOL,
+    rent_expiration_date DATE,
     sold BOOL,
     category VARCHAR(50),
     id_user INT,
