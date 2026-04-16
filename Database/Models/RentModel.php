@@ -245,8 +245,57 @@ class RentModel{
      * @param int $userID
      * @return void
      */
-    public function returnRentedBook(int $bookID, int $userID){
+    public function returnRentedBook(int $bookID, int $userID): bool{
+        $connection = $this->connect(SERVER, DATABASE, USER, PASSWORD);
+        $connection->autocommit(false);
+        $connection->begin_transaction();
 
+        //Quitar el libro de la tabla rented
+        $query = $connection->prepare('DELETE FROM rented WHERE rented.id_book = ? AND rented.id_user = ?');
+        $query->bind_param('ii', $bookID, $userID);
+
+        try{
+            $query->execute();
+            if($query->affected_rows === 0){
+                $connection->rollback();
+                $connection->autocommit(true);
+                return false;
+            }
+        }
+        //Se cancela si hay un error de inserción
+        catch(Exception $e){
+            $connection->rollback();
+            $connection->autocommit(true);
+            return false;
+        }
+
+        //Establecer en la tabla de libros las propiedades del libro rented a false y expiration date a null
+        $query = $connection->prepare('UPDATE books SET rented = ?, rent_expiration_date = ? WHERE id = ?');
+
+        $rented = false;
+        $expiration_date = null;
+        $query->bind_param('ssi', $rented, $expiration_date, $bookID);
+
+        try{
+            $query->execute();
+            if($query->affected_rows <= 0){
+                $connection->rollback();
+                $connection->autocommit(true);
+                return false;
+            }
+        }
+        //Se cancela si hay un error de inserción
+        catch(Exception $e){
+            $connection->rollback();
+            $connection->autocommit(true);
+            return false;
+        }
+
+        $connection->commit();
+        $connection->autocommit(true);
+        $connection->close();
+
+        return true;
     }
 }
 ?>

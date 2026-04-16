@@ -108,8 +108,32 @@ class RentController{
         exit;
     }
 
+    /**
+     * Endpoint /rent/return
+     * Devuelve un libro alquilado por un usuario
+     * @param int $userID
+     * @return never
+     */
     public static function returnBook(int $userID){
+        //Se recupera el body de la request en formato JSON
+        $inputJSON = file_get_contents('php://input');
+        $data = json_decode($inputJSON, TRUE);
 
+        //Bad Request si faltan campos
+        if(!isset($data['book_id'])) returnHTTPError('Book ID not provided', 400);
+
+        $model = new RentModel();
+        $returned = $model->returnRentedBook($data['book_id'], $userID);
+
+        if(!$returned) returnHTTPError('Return rent failed', 400);
+        
+        http_response_code(200);
+        header('Content-Type: application/json');
+
+        $response = array('message' => 'book returned');
+
+        echo json_encode($response);
+        exit;
     }
 }
 ?>
