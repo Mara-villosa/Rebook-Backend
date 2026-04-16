@@ -14,10 +14,10 @@ $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $request = explode( 'api.php', $uri )[1];
 
 //Necesitan una cabecera x-api-key válida
-$public_uri = array("/login", "/signup", "/refresh");
+$public_uri = array("/login", "/signup", "/refresh", "/books/getAll", "/books/category", "/books/getBook");
 
 //Necesitan una cabecera Authorization: Bearer JWT válida
-$private_uri = array("/user", "/books/new", "/books/delete", "/books/getAll", "/books/category", "/books/getFromUser", "/books/getBook"); 
+$private_uri = array("/user", "/books/new", "/books/delete", "/books/getFromUser" ); 
 
 //Llamadas públicas a la API (no necesitan autenticación)
 if(in_array($request, $public_uri)){
@@ -32,6 +32,15 @@ if(in_array($request, $public_uri)){
                 break;
             case '/refresh': 
                 TokenController::refresh();
+                break;
+            case '/books/getAll':
+                BooksController::getAllBooks();
+                break;
+            case '/books/category':
+                BooksController::getAllBooksFromCategory();
+                break;
+            case '/books/getBook':
+                BooksController::getBookDetails();
                 break;
             }
     }
@@ -53,17 +62,8 @@ else if(in_array($request, $private_uri)){
             case '/books/delete':
                 BooksController::deleteBook();
                 break;
-            case '/books/getAll':
-                BooksController::getAllBooks();
-                break;
-            case '/books/category':
-                BooksController::getAllBooksFromCategory();
-                break;
             case '/books/getFromUser':
                 BooksController::getAllBooksFromUser($userID);
-                break;
-            case '/books/getBook':
-                BooksController::getBookDetails();
                 break;
             }
     }
