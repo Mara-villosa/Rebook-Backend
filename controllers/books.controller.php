@@ -8,41 +8,41 @@ class BooksController{
     public static function uploadBook(int $userID){
         //Se recupera el body de la request en formato JSON
         $inputJSON = file_get_contents('php://input');
-        $signupData = json_decode($inputJSON, TRUE);
+        $data = json_decode($inputJSON, TRUE);
 
         //Bad Request si faltan campos
-        if(!isset($signupData['title'])) returnHTTPError('Title not provided', 400);
-        if(!isset($signupData['description'])) returnHTTPError('Description not provided', 400);
-        if(!isset($signupData['author'])) returnHTTPError('Author not provided', 400);
-        if(!isset($signupData['isbn'])) returnHTTPError('ISBN not provided', 400);
-        if(!isset($signupData['url'])) returnHTTPError('Cover URL image not provided', 400);
-        if(!isset($signupData['category'])) returnHTTPError('Category not provided', 400);
+        if(!isset($data['title'])) returnHTTPError('Title not provided', 400);
+        if(!isset($data['description'])) returnHTTPError('Description not provided', 400);
+        if(!isset($data['author'])) returnHTTPError('Author not provided', 400);
+        if(!isset($data['isbn'])) returnHTTPError('ISBN not provided', 400);
+        if(!isset($data['url'])) returnHTTPError('Cover URL image not provided', 400);
+        if(!isset($data['category'])) returnHTTPError('Category not provided', 400);
 
-        if(!isset($signupData['rent_price']) && !isset($signupData['sell_price'])) 
+        if(!isset($data['rent_price']) && !isset($data['sell_price'])) 
             returnHTTPError('Rent or Sell price must be provided', 400);
 
         $rent_price = -1;
-        if(isset($signupData['rent_price'])){
-            $rent_price = $signupData['rent_price'];
+        if(isset($data['rent_price'])){
+            $rent_price = $data['rent_price'];
             if($rent_price <= 0) returnHTTPError('Rent price must be higher than 0', 400);
         }
         
         $sell_price = -1;
-        if(isset($signupData['sell_price'])){
-            $sell_price = $signupData['sell_price'];
+        if(isset($data['sell_price'])){
+            $sell_price = $data['sell_price'];
             if($sell_price <= 0) returnHTTPError('Sell price must be higher than 0', 400);
         }
 
         $model = new BookModel();
         $created = $model->createBook(
-            $signupData['title'],
-            $signupData['description'], 
-            $signupData['author'],
+            $data['title'],
+            $data['description'], 
+            $data['author'],
             $rent_price, 
             $sell_price, 
-            $signupData['isbn'], 
-            $signupData['url'],
-            $signupData['category'],
+            $data['isbn'], 
+            $data['url'],
+            $data['category'],
             $userID);
 
         if($created){
@@ -63,13 +63,13 @@ class BooksController{
     public static function deleteBook(){
         //Se recupera el body de la request en formato JSON
         $inputJSON = file_get_contents('php://input');
-        $signupData = json_decode($inputJSON, TRUE);
+        $data = json_decode($inputJSON, TRUE);
 
         //Bad Request si faltan campos
-        if(!isset($signupData['book_id'])) returnHTTPError('Book ID not provided', 400);
+        if(!isset($data['book_id'])) returnHTTPError('Book ID not provided', 400);
 
         $model = new BookModel();
-        $deleted = $model->deleteBook($signupData['book_id']);
+        $deleted = $model->deleteBook($data['book_id']);
 
         if($deleted){
             http_response_code(200);
@@ -151,13 +151,13 @@ class BooksController{
     public static function getAllBooksFromCategory(){
         //Se recupera el body de la request en formato JSON
         $inputJSON = file_get_contents('php://input');
-        $signupData = json_decode($inputJSON, TRUE);
+        $data = json_decode($inputJSON, TRUE);
 
         //Bad Request si faltan campos
-        if(!isset($signupData['category'])) returnHTTPError('Category not provided', 400);
+        if(!isset($data['category'])) returnHTTPError('Category not provided', 400);
 
         $model = new BookModel();
-        $books = $model->getAllBooksByCategory($signupData['category']);
+        $books = $model->getAllBooksByCategory($data['category']);
 
         if(!isset($books)) returnHTTPError('Books not found', 404);
 
@@ -180,13 +180,13 @@ class BooksController{
     public static function getBookDetails(){
         //Se recupera el body de la request en formato JSON
         $inputJSON = file_get_contents('php://input');
-        $signupData = json_decode($inputJSON, TRUE);
+        $data = json_decode($inputJSON, TRUE);
 
         //Bad Request si faltan campos
-        if(!isset($signupData['book_id'])) returnHTTPError('Book ID not provided', 400);
+        if(!isset($data['book_id'])) returnHTTPError('Book ID not provided', 400);
 
         $model = new BookModel();
-        $book = $model->getBookDetails($signupData['book_id']);
+        $book = $model->getBookDetails($data['book_id']);
 
         if(!isset($book)) returnHTTPError('Books not found', 404);
 

@@ -34,7 +34,7 @@ class BookDTO{
         int $userID,
         bool $rentExpired,
         bool $sold,
-        string $expiration_date)
+        string | null $expiration_date)
     {
         $this->id = $id;
         $this->title = $title;
@@ -50,7 +50,7 @@ class BookDTO{
         $this->userID = $userID;
         $this->rentExpired = $rentExpired;
         $this->sold = $sold;
-        $this->expirationDate = $expiration_date;
+        isset($expiration_date) ? $this->expirationDate = $expiration_date : $this->expirationDate = '';
     }
 
     /**

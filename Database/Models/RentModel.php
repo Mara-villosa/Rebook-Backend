@@ -18,16 +18,78 @@ class RentModel{
         return $mysqli;
     }
 
+    /**
+     * Alquila un libro para el usuario que hace la petición durante dos semanas
+     * @param int $bookID
+     * @param int $userID
+     * @return string|null
+     */
     public function rentBook(int $bookID, int $userID){
+        $connection = $this->connect(SERVER, DATABASE, USER, PASSWORD);
+        $connection->autocommit(false);
+        $connection->begin_transaction();
 
-    }
+        $query = $connection->prepare('SELECT * FROM rented WHERE rented.id_book = ?');
+        $query->bind_param('i', $bookID);
+        $query->execute();
+        $query_result = $query->get_result();
 
-    public function checkRent(int $bookID, int $userID){
+        //El libro ya está alquilado
+        if($query_result->num_rows > 0){
+            $query_result->free();
+            $connection->rollback();
+            $connection->autocommit(true);
+            return null;
+        }
 
-    }
+        $query = $connection->prepare('INSERT INTO rented (id_user, id_book, rented_on, expiration_date) VALUES (?,?,?,?)');
 
-    public function extendRent(int $bookID, int $userID){
+        $currentDate = date('Y-m-d');
+        $enddate = strtotime("+2 weeks", strtotime($currentDate));
+        $expirationDate = date('Y-m-d', $enddate);
 
+        $query->bind_param('iiss', $userID, $bookID, $currentDate ,$expirationDate);
+
+        try{
+            $query->execute();
+        }
+        //Se cancela si hay un error de inserción
+        catch(Exception $e){
+            $connection->rollback();
+            $connection->autocommit(true);
+            return null;
+        }
+
+        $query_result = $query->get_result();
+
+        //Si hay un error o no encuentra el usuario, devuelve null
+        if ($connection->error || $query->affected_rows === 0) {
+            $query_result->free();
+            $connection->rollback();
+            $connection->autocommit(true);
+            return null;
+        }
+
+        $query = $connection->prepare('UPDATE books SET rented = ?, rent_expired = ?, rent_expiration_date = ? WHERE books.id = ?');
+
+        $rented = true;
+        $rent_expired = false;
+        $query->bind_param('sssi', $rented, $rent_expired, $expirationDate, $bookID);
+        $query->execute();
+
+        //Si hay un error o no encuentra el usuario, devuelve null
+        if ($connection->error || $query->affected_rows === 0) {
+            $query_result->free();
+            $connection->rollback();
+            $connection->autocommit(true);
+            return null;
+        }
+
+        $connection->commit();
+        $connection->autocommit(true);
+        $connection->close();
+
+        return $expirationDate;
     }
 
     /**
@@ -82,6 +144,43 @@ class RentModel{
         $connection->close();
 
         return $rented;
+    }
+
+    public function checkRent(int $bookID, int $userID){
+        $connection = $this->connect(SERVER, DATABASE, USER, PASSWORD);
+        $connection->autocommit(false);
+        $connection->begin_transaction();
+
+        //Todos los libros alquilados por un usuario
+        $query = $connection->prepare('SELECT * FROM rented WHERE rented.id_book = ? AND rented.id_user = ?');
+        $query->bind_param('ii', $bookID, $userID);
+        $query->execute();
+        $query_result = $query->get_result();
+
+        //Si hay un error o no encuentra el usuario, devuelve null
+        if ($connection->error || $query_result->num_rows === 0) {
+            $query_result->free();
+            $connection->rollback();
+            $connection->autocommit(true);
+            return null;
+        }
+
+        $result = $query_result->fetch_assoc();
+
+        $query_result->free();
+        $connection->commit();
+        $connection->autocommit(true);
+        $connection->close();
+
+        return $result['expiration_date'];
+    }
+
+    public function extendRent(int $bookID, int $userID){
+
+    }
+
+    public function returnRentedBook(int $bookID, int $userID){
+
     }
 }
 ?>

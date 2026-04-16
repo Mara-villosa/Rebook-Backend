@@ -187,7 +187,7 @@ class BookModel{
         $query_result = $query->get_result();
 
         //Si hay un error o no encuentra el usuario, devuelve null
-        if ($connection->error || $query_result->num_rows === 0) {
+        if ($connection->error) {
             $query_result->free();
             $connection->rollback();
             $connection->autocommit(true);
@@ -223,7 +223,7 @@ class BookModel{
         $query_result = $query->get_result();
 
         //Si hay un error o no encuentra el usuario, devuelve null
-        if ($connection->error || $query_result->num_rows === 0) {
+        if ($connection->error) {
             $query_result->free();
             $connection->rollback();
             $connection->autocommit(true);
@@ -258,8 +258,7 @@ class BookModel{
         $query->execute();
         $query_result = $query->get_result();
 
-        //Si hay un error o no encuentra el usuario, devuelve null
-        if ($connection->error || $query_result->num_rows === 0) {
+        if($connection->error){
             $query_result->free();
             $connection->rollback();
             $connection->autocommit(true);

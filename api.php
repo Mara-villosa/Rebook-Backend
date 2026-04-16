@@ -18,7 +18,7 @@ $request = explode( 'api.php', $uri )[1];
 $public_uri = array("/login", "/signup", "/refresh", "/books/getAll", "/books/category", "/books/getBook");
 
 //Necesitan una cabecera Authorization: Bearer JWT válida
-$private_uri = array("/user", "/books/new", "/books/delete", "/books/getFromUser", "/rent", "/rent/check", "/rent/extend", "/rent/get" ); 
+$private_uri = array("/user", "/books/new", "/books/delete", "/books/getFromUser", "/rent", "/rent/check", "/rent/extend", "/rent/get", "/rent/return" ); 
 
 //Llamadas públicas a la API (no necesitan autenticación)
 if(in_array($request, $public_uri)){
@@ -77,6 +77,9 @@ else if(in_array($request, $private_uri)){
                 break;
             case 'rent/get':
                 RentController::getRented($userID);
+                break;
+            case '/rent/return':
+                RentController::returnBook($userID);
                 break;
             }
     }

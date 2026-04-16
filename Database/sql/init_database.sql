@@ -1,5 +1,5 @@
-CREATE DATABASE Rebook;
-USE Rebook;
+CREATE DATABASE rebook;
+USE rebook;
 
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
