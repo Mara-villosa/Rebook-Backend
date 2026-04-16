@@ -14,7 +14,6 @@ class BookDTO{
     private string $category;
     private bool $inCart;
     private bool $rented;
-    private bool $rentExpired;
     private string $expirationDate;
     private int $userID;
     private bool $sold;
@@ -32,7 +31,6 @@ class BookDTO{
         bool $inCart, 
         bool $rented,
         int $userID,
-        bool $rentExpired,
         bool $sold,
         string | null $expiration_date)
     {
@@ -48,7 +46,6 @@ class BookDTO{
         $this->inCart = $inCart;
         $this->rented = $rented;
         $this->userID = $userID;
-        $this->rentExpired = $rentExpired;
         $this->sold = $sold;
         isset($expiration_date) ? $this->expirationDate = $expiration_date : $this->expirationDate = '';
     }
@@ -69,7 +66,6 @@ class BookDTO{
             'url' => $this->url,
             'category' => $this->category,
             'rented' => $this->rented,
-            'rent_expired' => $this->rentExpired,
             'inCart' => $this->inCart,
             'id_user' => $this->userID,
             'sold' => $this->sold,

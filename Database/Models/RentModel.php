@@ -131,7 +131,6 @@ class RentModel{
                 $result['in_cart'],
                 $result['rented'], 
                 $result['id_user'], 
-                $result['rent_expired'], 
                 $result['sold'],
                 $result['rent_expiration_date']);
 
@@ -240,6 +239,12 @@ class RentModel{
         return $new_expiration_date;
     }
 
+    /**
+     * Elimina un libro de la tabla de alquilados y establece las propiedades rented, rent
+     * @param int $bookID
+     * @param int $userID
+     * @return void
+     */
     public function returnRentedBook(int $bookID, int $userID){
 
     }

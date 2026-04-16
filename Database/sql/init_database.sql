@@ -29,7 +29,6 @@ CREATE TABLE books(
     url VARCHAR(250),
     in_cart BOOL,
     rented BOOL,
-    rent_expired BOOL,
     rent_expiration_date DATE,
     sold BOOL,
     category VARCHAR(50),
