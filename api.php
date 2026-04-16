@@ -7,6 +7,7 @@ require_once(ROOT . '/utils/CORS.php');
 require_once(ROOT . '/controllers/users.controller.php');
 require_once(ROOT . '/controllers/token.controller.php');
 require_once(ROOT . '/controllers/books.controller.php');
+require_once(ROOT . '/controllers/rent.controller.php');
 
 CORSUtils::handleCORS();
 
@@ -17,7 +18,7 @@ $request = explode( 'api.php', $uri )[1];
 $public_uri = array("/login", "/signup", "/refresh", "/books/getAll", "/books/category", "/books/getBook");
 
 //Necesitan una cabecera Authorization: Bearer JWT válida
-$private_uri = array("/user", "/books/new", "/books/delete", "/books/getFromUser" ); 
+$private_uri = array("/user", "/books/new", "/books/delete", "/books/getFromUser", "/rent", "/rent/check", "/rent/extend", "/rent/get" ); 
 
 //Llamadas públicas a la API (no necesitan autenticación)
 if(in_array($request, $public_uri)){
@@ -64,6 +65,18 @@ else if(in_array($request, $private_uri)){
                 break;
             case '/books/getFromUser':
                 BooksController::getAllBooksFromUser($userID);
+                break;
+            case '/rent':
+                RentController::rent($userID);
+                break;
+            case '/rent/check':
+                RentController::checkRent($userID);
+                break;
+            case '/rent/extend':
+                RentController::extendRent($userID);
+                break;
+            case 'rent/get':
+                RentController::getRented($userID);
                 break;
             }
     }

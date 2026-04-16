@@ -52,11 +52,12 @@ class BookModel{
         $connection->autocommit(false);
         $connection->begin_transaction();
        
-        $query = $connection->prepare('INSERT INTO books (title, author, description, rent_price, sell_price, isbn, url, category, in_cart, rented, id_user, rent_expired, sold) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+        $query = $connection->prepare('INSERT INTO books (title, author, description, rent_price, sell_price, isbn, url, category, in_cart, rented, id_user, rent_expired, sold, rent_expiration_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
 
         $inCart = $rented = $rent_expired = $sold = false;
         $category = strtolower($category);
-        $query->bind_param('sssddsssssiss', $title, $author, $description, $rent_price, $sell_price, $isbn, $url, $category, $inCart, $rented, $userID, $rent_expired, $sold);
+        $rent_expiration_date = '';
+        $query->bind_param('sssddsssssisss', $title, $author, $description, $rent_price, $sell_price, $isbn, $url, $category, $inCart, $rented, $userID, $rent_expired, $sold, $rent_expiration_date);
 
         try{
             $query->execute();
@@ -152,7 +153,8 @@ class BookModel{
                 $result['rented'], 
                 $result['id_user'],
                 $result['rent_expired'], 
-                $result['sold']);
+                $result['sold'],
+                $result['rent_expiration_date']);
 
             array_push($books, $book);
         }
@@ -207,7 +209,8 @@ class BookModel{
                 $result['rented'], 
                 $result['id_user'], 
                 $result['rent_expired'], 
-                $result['sold']);
+                $result['sold'],
+                $result['rent_expiration_date']);
 
             array_push($uploads, $book);
         }
@@ -242,7 +245,8 @@ class BookModel{
                 $result['rented'], 
                 $result['id_user'], 
                 $result['rent_expired'], 
-                $result['sold']);
+                $result['sold'],
+                $result['rent_expiration_date']);
 
             array_push($rented, $book);
         }
@@ -277,7 +281,8 @@ class BookModel{
                 $result['rented'], 
                 $result['id_user'], 
                 $result['rent_expired'], 
-                $result['sold']);
+                $result['sold'],
+                $result['rent_expiration_date']);
 
             array_push($bought, $book);
         }
@@ -331,7 +336,8 @@ class BookModel{
                 $result['rented'], 
                 $result['id_user'],
                 $result['rent_expired'], 
-                $result['sold']);
+                $result['sold'],
+                $result['rent_expiration_date']);
 
             array_push($books, $book);
         }
@@ -388,7 +394,8 @@ class BookModel{
             $result['rented'], 
             $result['id_user'],
             $result['rent_expired'], 
-            $result['sold']);
+            $result['sold'],
+            $result['rent_expiration_date']);
 
         $query_result->free();
         $connection->commit();

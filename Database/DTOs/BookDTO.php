@@ -15,6 +15,7 @@ class BookDTO{
     private bool $inCart;
     private bool $rented;
     private bool $rentExpired;
+    private string $expirationDate;
     private int $userID;
     private bool $sold;
 
@@ -32,7 +33,8 @@ class BookDTO{
         bool $rented,
         int $userID,
         bool $rentExpired,
-        bool $sold)
+        bool $sold,
+        string $expiration_date)
     {
         $this->id = $id;
         $this->title = $title;
@@ -48,6 +50,7 @@ class BookDTO{
         $this->userID = $userID;
         $this->rentExpired = $rentExpired;
         $this->sold = $sold;
+        $this->expirationDate = $expiration_date;
     }
 
     /**
@@ -69,7 +72,8 @@ class BookDTO{
             'rent_expired' => $this->rentExpired,
             'inCart' => $this->inCart,
             'id_user' => $this->userID,
-            'sold' => $this->sold        
+            'sold' => $this->sold,
+            'rent_expiration_date' => $this->expirationDate     
         ];
     }
 }
