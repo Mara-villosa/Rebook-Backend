@@ -146,6 +146,11 @@ class RentModel{
         return $rented;
     }
 
+    /**
+     * Devuelve la fecha de expiración de un libro, o null si no lo encuentra
+     * @param int $bookID
+     * @param int $userID
+     */
     public function checkRent(int $bookID, int $userID){
         $connection = $this->connect(SERVER, DATABASE, USER, PASSWORD);
         $connection->autocommit(false);
@@ -175,8 +180,64 @@ class RentModel{
         return $result['expiration_date'];
     }
 
+    /**
+     * Extiende la fecha de devolución de un libro alquilado por 2 semanas
+     * @param int $bookID
+     * @param int $userID
+     * @return string|null
+     */
     public function extendRent(int $bookID, int $userID){
+        $connection = $this->connect(SERVER, DATABASE, USER, PASSWORD);
+        $connection->autocommit(false);
+        $connection->begin_transaction();
 
+        $query = $connection->prepare('SELECT expiration_date FROM rented WHERE rented.id_book = ? AND rented.id_user = ?');
+        $query->bind_param('ii', $bookID, $userID);
+        $query->execute();
+        $query_result = $query->get_result();
+        //Si hay un error o no encuentra el usuario, devuelve null
+        if ($connection->error || $query_result->num_rows === 0) {
+            $query_result->free();
+            $connection->rollback();
+            $connection->autocommit(true);
+            return null;
+        }
+
+        $result = $query_result->fetch_assoc();
+        $old_expiration_date = $result['expiration_date'];
+        $enddate = strtotime("+2 weeks", strtotime($old_expiration_date));
+        $new_expiration_date = date('Y-m-d', $enddate);
+
+        $query = $connection->prepare('UPDATE rented SET expiration_date = ? WHERE rented.id_book = ? AND rented.id_user = ?');
+        $query->bind_param('sii', $new_expiration_date, $bookID, $userID);
+        $query->execute();
+
+        //Si hay un error o no encuentra el usuario, devuelve null
+        if ($connection->error || $query->affected_rows === 0) {
+            $query_result->free();
+            $connection->rollback();
+            $connection->autocommit(true);
+            return null;
+        }
+
+        $query = $connection->prepare('UPDATE books SET rent_expiration_date = ? WHERE id = ?');
+        $query->bind_param('si', $new_expiration_date, $bookID);
+        $query->execute();
+
+        //Si hay un error o no encuentra el usuario, devuelve null
+        if ($connection->error || $query->affected_rows === 0) {
+            $query_result->free();
+            $connection->rollback();
+            $connection->autocommit(true);
+            return null;
+        }
+
+        $query_result->free();
+        $connection->commit();
+        $connection->autocommit(true);
+        $connection->close();
+
+        return $new_expiration_date;
     }
 
     public function returnRentedBook(int $bookID, int $userID){
