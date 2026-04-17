@@ -17,7 +17,10 @@ $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $request = explode( 'api.php', $uri )[1];
 
 //Necesitan una cabecera x-api-key válida
-$public_uri = array("/login", "/signup", "/refresh", "/books/getAll", "/books/category", "/books/getBook");
+$public_uri = array(
+"/login", "/signup", 
+"/refresh", 
+"/books/getAll", "/books/category", "/books/getBook");
 
 //Necesitan una cabecera Authorization: Bearer JWT válida
 $private_uri = array(

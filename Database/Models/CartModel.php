@@ -179,11 +179,123 @@ class CartModel{
         return $books;
     }
 
+    /**
+     * Comprueba, por cada libro añadido al carrito si se ha añadido para alquilar o no. 
+     * Si se ha añadido para alquilar, se usa rentBook de rentModel para alquilarlo. 
+     * Si se ha añadido para comprar, se añade a la tabla bought.
+     * Después, se vacía el carrito del usuario
+     * @param int $userID
+     * @return bool|string|null
+     */
     public function buyBooksInCart(int $userID){
-        //Para cada libro del carrito del usuario, comprobar si lo quiere alquilar o no
-        //Si lo quiere alquilar, llamar a la función rentBook del RentModel y actualizar la propiedad de en carrito a false
-        //Si lo quiere comprar, actualizar del libro la propiedad comprado a true, in cart a false y añadirlo a la tabla de comprados
+        //Select de todos los libros de la tabla
+        $connection = DatabaseConfig::connect();
+        $connection->autocommit(false);
+        $connection->begin_transaction();
+
+        $query = $connection->prepare('SELECT * FROM books INNER JOIN carts ON books.id = carts.id_book WHERE carts.id_user = ?');
+        $query->bind_param('i', $userID);
+        $query->execute();
+        $query_result = $query->get_result();
+
+        //Si hay un error o no encuentra libros, devuelve null
+        if ($connection->error || $query_result->num_rows === 0) {
+            $query_result->free();
+            $connection->rollback();
+            $connection->autocommit(true);
+            return false;
+        }
+
+        $books = $query_result->fetch_all(MYSQLI_ASSOC);
+
+        //Recorrer libros del carrito y operar según si se han añadido para alquilar o para comprar
+        for($i = 0; $i < count($books); $i++){
+            //El libro se ha añadido par aalquilar
+            if($books[$i]['is_rent']){
+                //Quitar propiedad de carrito in_cart del carrito (no se pueden alquilar libros en el carrito)
+                $query = $connection->prepare('UPDATE books SET in_cart = FALSE WHERE books.id = ?');
+                $query->bind_param('i', $books[$i]['id']);
+                $query->execute();
+
+                if ($connection->error || $query->affected_rows === 0) {
+                    $connection->rollback();
+                    $connection->autocommit(true);
+                    return false;
+                }
+
+                //Alquilar el libro
+                $rentModel = new RentModel();
+                $expirationDate = $rentModel->rentBookFromCart($books[$i]['id'], $userID, $connection);
+
+                if(!isset($expirationDate)){
+                    $connection->rollback();
+                    $connection->autocommit(true);
+                    return false;
+                }
+
+            }
+            //El libro se ha añadido para Comprar
+            else{
+                //Actualizar propiedad sold del libro a true
+                $query = $connection->prepare('UPDATE books SET sold = TRUE, in_cart = FALSE WHERE books.id = ?');
+                $query->bind_param('i', $books[$i]['id']);
+                $query->execute();
+
+                if ($connection->error || $query->affected_rows === 0) {
+                    $connection->rollback();
+                    $connection->autocommit(true);
+                    return false;
+                }
+
+                //Añadirlo a la tabla de comprados
+                $query = $connection->prepare('INSERT INTO bought (id_user, id_book, bought_on) VALUES (?,?,?)');
+                $currentDate = date('Y-m-d');
+                $query->bind_param('iis', $userID, $books[$i]['id'], $currentDate);
+
+                try{
+                    $query->execute();
+                }
+                //Se cancela si hay un error de inserción
+                catch(Exception $e){
+                    $connection->rollback();
+                    $connection->autocommit(true);
+                    return false;
+                }
+
+                //Si hay un error o no se inserta el libro, devuelve null
+                if ($connection->error || $query->affected_rows === 0) {
+                    $connection->rollback();
+                    $connection->autocommit(true);
+                    return false;
+                }
+            }
+        }
+
         //Después borrar todas las filas de carrito de este usuario
+        $query = $connection->prepare('DELETE FROM carts WHERE carts.id_user = ?');
+        $query->bind_param('i', $userID);
+
+        try{
+            $query->execute();
+            if($query->affected_rows === 0){
+                $connection->rollback();
+                $connection->autocommit(true);
+                return false;
+            }
+        }
+        //Se cancela si hay un error de inserción
+        catch(Exception $e){
+            $connection->rollback();
+            $connection->autocommit(true);
+            return false;
+        }
+
+        $query_result->free();
+        $connection->commit();
+        $connection->autocommit(true);
+        $connection->close();
+
+        return true;
     }
 }
 ?>
