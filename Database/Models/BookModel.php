@@ -37,12 +37,11 @@ class BookModel{
         $connection->autocommit(false);
         $connection->begin_transaction();
        
-        $query = $connection->prepare('INSERT INTO books (title, author, description, rent_price, sell_price, isbn, url, category, in_cart, rented, id_user, sold, rent_expiration_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+        $query = $connection->prepare('INSERT INTO books (title, author, description, rent_price, sell_price, isbn, url, category, in_cart, rented, id_user, sold) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
 
         $inCart = $rented = $sold = false;
         $category = strtolower($category);
-        $rent_expiration_date = '';
-        $query->bind_param('sssddsssssiss', $title, $author, $description, $rent_price, $sell_price, $isbn, $url, $category, $inCart, $rented, $userID, $sold, $rent_expiration_date);
+        $query->bind_param('sssddsssssis', $title, $author, $description, $rent_price, $sell_price, $isbn, $url, $category, $inCart, $rented, $userID, $sold);
 
         try{
             $query->execute();

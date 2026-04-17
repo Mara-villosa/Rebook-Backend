@@ -74,9 +74,11 @@ class BookDTO{
             'inCart' => $this->inCart,
             'id_user' => $this->userID,
             'sold' => $this->sold,
-            'rent_expiration_date' => $this->expirationDate,
-            'in_cart_for_rent' => $this->inCartForRent     
+            'rent_expiration_date' => $this->expirationDate   
         ];
+        if($this->inCartForRent)
+            $json['in_cart_for_rent'] = $this->inCartForRent;
+
         return $json;
     }
 }
