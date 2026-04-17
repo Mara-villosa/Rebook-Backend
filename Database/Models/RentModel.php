@@ -45,31 +45,27 @@ class RentModel{
             return null;
         }
 
-        $query_result = $query->get_result();
-
         //Si hay un error o no encuentra el usuario, devuelve null
         if ($connection->error || $query->affected_rows === 0) {
-            $query_result->free();
             $connection->rollback();
             $connection->autocommit(true);
             return null;
         }
 
-        $query = $connection->prepare('UPDATE books SET rented = ?, rent_expired = ?, rent_expiration_date = ? WHERE books.id = ?');
+        $query = $connection->prepare('UPDATE books SET rented = ?, rent_expiration_date = ? WHERE books.id = ?');
 
         $rented = true;
-        $rent_expired = false;
-        $query->bind_param('sssi', $rented, $rent_expired, $expirationDate, $bookID);
+        $query->bind_param('ssi', $rented, $expirationDate, $bookID);
         $query->execute();
 
         //Si hay un error o no encuentra el usuario, devuelve null
         if ($connection->error || $query->affected_rows === 0) {
-            $query_result->free();
             $connection->rollback();
             $connection->autocommit(true);
             return null;
         }
 
+        $query_result->free();
         $connection->commit();
         $connection->autocommit(true);
         $connection->close();
@@ -94,7 +90,7 @@ class RentModel{
         $query->execute();
         $query_result = $query->get_result();
 
-        //Si hay un error o no encuentra el usuario, devuelve null
+        //Si hay un error o no encuetra el libro, devuelve null
         if ($connection->error || $query_result->num_rows === 0) {
             $query_result->free();
             $connection->rollback();
@@ -146,7 +142,7 @@ class RentModel{
         $query->execute();
         $query_result = $query->get_result();
 
-        //Si hay un error o no encuentra el usuario, devuelve null
+        //Si hay un error o no encuentra el libro, devuelve null
         if ($connection->error || $query_result->num_rows === 0) {
             $query_result->free();
             $connection->rollback();
@@ -179,7 +175,8 @@ class RentModel{
         $query->bind_param('ii', $bookID, $userID);
         $query->execute();
         $query_result = $query->get_result();
-        //Si hay un error o no encuentra el usuario, devuelve null
+
+        //Si hay un error o no encuentra el libro, devuelve null
         if ($connection->error || $query_result->num_rows === 0) {
             $query_result->free();
             $connection->rollback();
@@ -196,7 +193,7 @@ class RentModel{
         $query->bind_param('sii', $new_expiration_date, $bookID, $userID);
         $query->execute();
 
-        //Si hay un error o no encuentra el usuario, devuelve null
+        //Si hay un error o no ha actualizado el libro, devuelve null
         if ($connection->error || $query->affected_rows === 0) {
             $query_result->free();
             $connection->rollback();

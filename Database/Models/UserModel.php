@@ -225,6 +225,7 @@ class UserModel{
         }
 
         $afectedRows = -1;
+        
         //Actualización de contraseña
         if(isset($oldPassword) && isset($newPassword)){
             $query = $connection->prepare('SELECT * FROM users WHERE ID = ?');

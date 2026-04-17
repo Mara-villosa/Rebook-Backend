@@ -19,7 +19,8 @@ $request = explode( 'api.php', $uri )[1];
 $public_uri = array("/login", "/signup", "/refresh", "/books/getAll", "/books/category", "/books/getBook");
 
 //Necesitan una cabecera Authorization: Bearer JWT válida
-$private_uri = array("/user", 
+$private_uri = array(
+"/user", 
 "/books/new", "/books/delete", "/books/getFromUser", 
 "/rent", "/rent/check", "/rent/extend", "/rent/get", "/rent/return", 
 "/fav/add", "/fav/remove", "/fav/get" ); 

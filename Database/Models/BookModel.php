@@ -37,12 +37,12 @@ class BookModel{
         $connection->autocommit(false);
         $connection->begin_transaction();
        
-        $query = $connection->prepare('INSERT INTO books (title, author, description, rent_price, sell_price, isbn, url, category, in_cart, rented, id_user, rent_expired, sold, rent_expiration_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+        $query = $connection->prepare('INSERT INTO books (title, author, description, rent_price, sell_price, isbn, url, category, in_cart, rented, id_user, sold, rent_expiration_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
 
-        $inCart = $rented = $rent_expired = $sold = false;
+        $inCart = $rented = $sold = false;
         $category = strtolower($category);
         $rent_expiration_date = '';
-        $query->bind_param('sssddsssssisss', $title, $author, $description, $rent_price, $sell_price, $isbn, $url, $category, $inCart, $rented, $userID, $rent_expired, $sold, $rent_expiration_date);
+        $query->bind_param('sssddsssssiss', $title, $author, $description, $rent_price, $sell_price, $isbn, $url, $category, $inCart, $rented, $userID, $sold, $rent_expiration_date);
 
         try{
             $query->execute();
@@ -114,7 +114,7 @@ class BookModel{
         $query->execute();
         $query_result = $query->get_result();
 
-        //Si hay un error o no encuentra el usuario, devuelve null
+        //Si hay un error o no encuentra libros, devuelve null
         if ($connection->error || $query_result->num_rows === 0) {
             $query_result->free();
             $connection->rollback();
@@ -170,7 +170,6 @@ class BookModel{
         $query->execute();
         $query_result = $query->get_result();
 
-        //Si hay un error o no encuentra el usuario, devuelve null
         if ($connection->error) {
             $query_result->free();
             $connection->rollback();
@@ -205,7 +204,6 @@ class BookModel{
         $query->execute();
         $query_result = $query->get_result();
 
-        //Si hay un error o no encuentra el usuario, devuelve null
         if ($connection->error) {
             $query_result->free();
             $connection->rollback();
@@ -292,7 +290,7 @@ class BookModel{
         $query->execute();
         $query_result = $query->get_result();
 
-        //Si hay un error o no encuentra el usuario, devuelve null
+        //Si hay un error o no encuentra libros, devuelve null
         if ($connection->error || $query_result->num_rows === 0) {
             $query_result->free();
             $connection->rollback();
@@ -343,7 +341,7 @@ class BookModel{
         $query->execute();
         $query_result = $query->get_result();
 
-        //Si hay un error o no encuentra el usuario, devuelve null
+        //Si hay un error o no encuentra el libro, devuelve null
         if ($connection->error || $query_result->num_rows === 0) {
             $query_result->free();
             $connection->rollback();

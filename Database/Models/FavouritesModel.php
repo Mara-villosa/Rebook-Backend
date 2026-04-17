@@ -112,7 +112,7 @@ class FavouritesModel{
         $query->execute();
         $query_result = $query->get_result();
 
-        //Si hay un error o no encuentra el usuario, devuelve null
+        //Si hay un error o no encuentra libros, devuelve null
         if ($connection->error || $query_result->num_rows === 0) {
             $query_result->free();
             $connection->rollback();
