@@ -167,6 +167,7 @@ class CartModel{
                 $result['id_user'],
                 $result['sold'],
                 $result['rent_expiration_date']);
+            $book->setInCartForRent($result['is_rent']);
 
             array_push($books, $book);
         }
