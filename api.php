@@ -8,6 +8,7 @@ require_once(ROOT . '/controllers/users.controller.php');
 require_once(ROOT . '/controllers/token.controller.php');
 require_once(ROOT . '/controllers/books.controller.php');
 require_once(ROOT . '/controllers/rent.controller.php');
+require_once(ROOT . '/controllers/favs.controller.php');
 
 CORSUtils::handleCORS();
 
