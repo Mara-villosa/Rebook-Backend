@@ -18,6 +18,7 @@ class BookDTO{
     private int $userID;
     private bool $sold;
     private bool $inCartForRent = false;
+    private bool $cartRequest = false;
 
     public function __construct(
         int $id, 
@@ -52,6 +53,7 @@ class BookDTO{
     }
 
     public function setInCartForRent(bool $inCartForRent){
+        $this->cartRequest = true;
         $this->inCartForRent = $inCartForRent;
     }
 
@@ -76,7 +78,7 @@ class BookDTO{
             'sold' => $this->sold,
             'rent_expiration_date' => $this->expirationDate   
         ];
-        if($this->inCartForRent)
+        if($this->cartRequest)
             $json['in_cart_for_rent'] = $this->inCartForRent;
 
         return $json;
