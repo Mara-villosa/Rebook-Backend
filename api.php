@@ -9,6 +9,7 @@ require_once(ROOT . '/controllers/token.controller.php');
 require_once(ROOT . '/controllers/books.controller.php');
 require_once(ROOT . '/controllers/rent.controller.php');
 require_once(ROOT . '/controllers/favs.controller.php');
+require_once(ROOT . '/controllers/cart.controller.php');
 
 CORSUtils::handleCORS();
 
@@ -23,7 +24,8 @@ $private_uri = array(
 "/user", 
 "/books/new", "/books/delete", "/books/getFromUser", 
 "/rent", "/rent/check", "/rent/extend", "/rent/get", "/rent/return", 
-"/fav/add", "/fav/remove", "/fav/get" ); 
+"/fav/add", "/fav/remove", "/fav/get",
+"/cart/add", "/cart/remove", "/cart/get", "/cart/buy"); 
 
 //Llamadas públicas a la API (no necesitan autenticación)
 if(in_array($request, $public_uri)){
@@ -59,9 +61,11 @@ else if(in_array($request, $private_uri)){
     if(HeaderUtils::checkValidPrivateAPICall()){
         $userID = HeaderUtils::getUserID();
         switch($request){
+            //User endpoints
             case '/user': 
                 UsersController::patchUser($userID);
                 break;
+            //Book endpoints
             case '/books/new':
                 BooksController::uploadBook($userID);
                 break;
@@ -71,6 +75,7 @@ else if(in_array($request, $private_uri)){
             case '/books/getFromUser':
                 BooksController::getAllBooksFromUser($userID);
                 break;
+            //Rent endpoints
             case '/rent':
                 RentController::rent($userID);
                 break;
@@ -86,6 +91,7 @@ else if(in_array($request, $private_uri)){
             case '/rent/return':
                 RentController::returnBook($userID);
                 break;
+            //Fav endpoints
             case '/fav/add':
                 FavsController::addFavBook($userID);
                 break;
@@ -94,6 +100,19 @@ else if(in_array($request, $private_uri)){
                 break;
             case '/fav/get':
                 FavsController::getFavBooks($userID);
+                break;
+            //Cart endpoints
+            case '/cart/add':
+                CartController::addToCart($userID);
+                break;
+            case '/cart/remove':
+                CartController::removeFromCart($userID);
+                break;
+            case '/cart/get':
+                CartController::getCart($userID);
+                break;
+            case '/cart/buy':
+                CartController::buyCart($userID);
                 break;
             }
     }

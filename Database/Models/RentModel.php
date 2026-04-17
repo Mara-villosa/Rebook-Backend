@@ -45,7 +45,7 @@ class RentModel{
             return null;
         }
 
-        //Si hay un error o no encuentra el usuario, devuelve null
+        //Si hay un error o no se inserta el libro, devuelve null
         if ($connection->error || $query->affected_rows === 0) {
             $connection->rollback();
             $connection->autocommit(true);
