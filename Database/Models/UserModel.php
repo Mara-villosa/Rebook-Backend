@@ -7,26 +7,6 @@ require_once(ROOT . '/database/DTOs/UserDTO.php');
  */
 class UserModel{
     /**
-     * Devuelve un objeto de conexión a la base de datos MySQLi.
-     * Devuelve null si no se puede conectar.
-     * @param string $server servidor de la base de datos
-     * @param string $database nombre de la base de datos
-     * @param string $user usuario de conexión
-     * @param string $password contraseña de conexión
-     * @return mysqli|null
-     */
-    private function connect(string $server, string $database, string $user, string $password)
-    {
-        $mysqli = new mysqli($server, $user, $password, $database);
-
-        if ($mysqli->connect_error) {
-            return null;
-        }
-
-        return $mysqli;
-    }
-
-    /**
      * Devuelve los datos de id, nombre e email del usuario si
      * se ha introducido un email y contraseña de login correctos. 
      * Si no, devuelve null.
@@ -35,7 +15,7 @@ class UserModel{
      * @return UserDTO|null
      */
     public function logInUser (string $email, string $password){
-        $connection = $this->connect(SERVER, DATABASE, USER, PASSWORD);
+        $connection = DatabaseConfig::connect();
         $connection->autocommit(false);
         $connection->begin_transaction();
 
@@ -116,7 +96,7 @@ class UserModel{
         string | null $card_number = null, 
         string | null $cvv = null)
         {
-        $connection = $this->connect(SERVER, DATABASE, USER, PASSWORD);
+        $connection = DatabaseConfig::connect();
 
         //Se cancela si hay un error de conexión
         if ($connection->error) {
@@ -195,7 +175,7 @@ class UserModel{
         string | null $card_number = null, 
         string | null $cvv = null): bool
     {
-        $connection = $this->connect(SERVER, DATABASE, USER, PASSWORD);
+        $connection = DatabaseConfig::connect();
 
         //Se cancela si hay un error de conexión
         if ($connection->error) {

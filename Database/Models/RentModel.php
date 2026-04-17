@@ -4,28 +4,13 @@ require_once(ROOT . '/database/DTOs/BookDTO.php');
 
 class RentModel{
     /**
-     * Devuelve un objeto de conexión a la base de datos MySQLi.
-     * Devuelve null si no se puede conectar.
-     * @param string $server servidor de la base de datos
-     * @param string $database nombre de la base de datos
-     * @param string $user usuario de conexión
-     * @param string $password contraseña de conexión
-     * @return mysqli|null
-     */
-    private function connect(string $server, string $database, string $user, string $password){
-        $mysqli = new mysqli($server, $user, $password, $database);
-        if ($mysqli->connect_error)  return null;
-        return $mysqli;
-    }
-
-    /**
      * Alquila un libro para el usuario que hace la petición durante dos semanas
      * @param int $bookID
      * @param int $userID
      * @return string|null
      */
     public function rentBook(int $bookID, int $userID){
-        $connection = $this->connect(SERVER, DATABASE, USER, PASSWORD);
+        $connection = DatabaseConfig::connect();;
         $connection->autocommit(false);
         $connection->begin_transaction();
 
@@ -98,7 +83,7 @@ class RentModel{
      * @return array|null
      */
     public function getRentedBooks(int $userID){
-        $connection = $this->connect(SERVER, DATABASE, USER, PASSWORD);
+        $connection = DatabaseConfig::connect();
         $connection->autocommit(false);
         $connection->begin_transaction();
 
@@ -151,7 +136,7 @@ class RentModel{
      * @param int $userID
      */
     public function checkRent(int $bookID, int $userID){
-        $connection = $this->connect(SERVER, DATABASE, USER, PASSWORD);
+        $connection = DatabaseConfig::connect();
         $connection->autocommit(false);
         $connection->begin_transaction();
 
@@ -186,7 +171,7 @@ class RentModel{
      * @return string|null
      */
     public function extendRent(int $bookID, int $userID){
-        $connection = $this->connect(SERVER, DATABASE, USER, PASSWORD);
+        $connection = DatabaseConfig::connect();
         $connection->autocommit(false);
         $connection->begin_transaction();
 
@@ -246,7 +231,7 @@ class RentModel{
      * @return void
      */
     public function returnRentedBook(int $bookID, int $userID): bool{
-        $connection = $this->connect(SERVER, DATABASE, USER, PASSWORD);
+        $connection = DatabaseConfig::connect();
         $connection->autocommit(false);
         $connection->begin_transaction();
 
