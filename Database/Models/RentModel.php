@@ -27,6 +27,21 @@ class RentModel{
             return null;
         }
 
+        //No alquilar libros que estén en el carrito de otras personas
+        $query = $connection->prepare('SELECT * FROM books WHERE books.id = ? AND books.in_cart = TRUE');
+        $query->bind_param('i', $bookID);
+        $query->execute();
+        $query_result = $query->get_result();
+
+        //El libro ya está en un carrito
+        if($query_result->num_rows > 0){
+            
+            $query_result->free();
+            $connection->rollback();
+            $connection->autocommit(true);
+            return null;
+        }
+
         $query = $connection->prepare('INSERT INTO rented (id_user, id_book, rented_on, expiration_date) VALUES (?,?,?,?)');
 
         $currentDate = date('Y-m-d');
@@ -45,7 +60,7 @@ class RentModel{
             return null;
         }
 
-        //Si hay un error o no encuentra el usuario, devuelve null
+        //Si hay un error o no se inserta el libro, devuelve null
         if ($connection->error || $query->affected_rows === 0) {
             $connection->rollback();
             $connection->autocommit(true);
@@ -69,6 +84,67 @@ class RentModel{
         $connection->commit();
         $connection->autocommit(true);
         $connection->close();
+
+        return $expirationDate;
+    }
+
+    /**
+     * Alquila un libro que se haya añadido para alquilar al carrito cuando se compra todo el carrito
+     * @param int $bookID
+     * @param int $userID
+     * @return string|null
+     */
+    public function rentBookFromCart(int $bookID, int $userID, $connection){
+        $query = $connection->prepare('SELECT * FROM rented WHERE rented.id_book = ?');
+        $query->bind_param('i', $bookID);
+        $query->execute();
+        $query_result = $query->get_result();
+
+        //El libro ya está alquilado
+        if($query_result->num_rows > 0){
+            $query_result->free();
+            $connection->rollback();
+            $connection->autocommit(true);
+            return null;
+        }
+
+        $query = $connection->prepare('INSERT INTO rented (id_user, id_book, rented_on, expiration_date) VALUES (?,?,?,?)');
+
+        $currentDate = date('Y-m-d');
+        $enddate = strtotime("+2 weeks", strtotime($currentDate));
+        $expirationDate = date('Y-m-d', $enddate);
+
+        $query->bind_param('iiss', $userID, $bookID, $currentDate ,$expirationDate);
+
+        try{
+            $query->execute();
+        }
+        //Se cancela si hay un error de inserción
+        catch(Exception $e){
+            $connection->rollback();
+            $connection->autocommit(true);
+            return null;
+        }
+
+        //Si hay un error o no se inserta el libro, devuelve null
+        if ($connection->error || $query->affected_rows === 0) {
+            $connection->rollback();
+            $connection->autocommit(true);
+            return null;
+        }
+
+        $query = $connection->prepare('UPDATE books SET rented = ?, rent_expiration_date = ? WHERE books.id = ?');
+
+        $rented = true;
+        $query->bind_param('ssi', $rented, $expirationDate, $bookID);
+        $query->execute();
+
+        //Si hay un error o no encuentra el usuario, devuelve null
+        if ($connection->error || $query->affected_rows === 0) {
+            $connection->rollback();
+            $connection->autocommit(true);
+            return null;
+        }
 
         return $expirationDate;
     }

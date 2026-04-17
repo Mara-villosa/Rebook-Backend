@@ -17,6 +17,7 @@ class BookDTO{
     private string $expirationDate;
     private int $userID;
     private bool $sold;
+    private bool $inCartForRent = false;
 
     public function __construct(
         int $id, 
@@ -50,12 +51,16 @@ class BookDTO{
         isset($expiration_date) ? $this->expirationDate = $expiration_date : $this->expirationDate = '';
     }
 
+    public function setInCartForRent(bool $inCartForRent){
+        $this->inCartForRent = $inCartForRent;
+    }
+
     /**
      * Devuelve los datos del libro en formato JSON
      * @return array{author: string, category: string, id: int, isbn: string, rentPrice: float, sellPrice: float, title: string, url: string}
      */
     public function jsonSerialize(){
-        return [
+        $json = [
             'id' => $this->id,
             'title' => $this->title,
             'author' => $this->author,
@@ -69,8 +74,12 @@ class BookDTO{
             'inCart' => $this->inCart,
             'id_user' => $this->userID,
             'sold' => $this->sold,
-            'rent_expiration_date' => $this->expirationDate     
+            'rent_expiration_date' => $this->expirationDate   
         ];
+        if($this->inCartForRent)
+            $json['in_cart_for_rent'] = $this->inCartForRent;
+
+        return $json;
     }
 }
 ?>
