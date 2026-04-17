@@ -18,7 +18,10 @@ $request = explode( 'api.php', $uri )[1];
 $public_uri = array("/login", "/signup", "/refresh", "/books/getAll", "/books/category", "/books/getBook");
 
 //Necesitan una cabecera Authorization: Bearer JWT válida
-$private_uri = array("/user", "/books/new", "/books/delete", "/books/getFromUser", "/rent", "/rent/check", "/rent/extend", "/rent/get", "/rent/return" ); 
+$private_uri = array("/user", 
+"/books/new", "/books/delete", "/books/getFromUser", 
+"/rent", "/rent/check", "/rent/extend", "/rent/get", "/rent/return", 
+"/fav/add", "/fav/remove", "/fav/get" ); 
 
 //Llamadas públicas a la API (no necesitan autenticación)
 if(in_array($request, $public_uri)){
@@ -80,6 +83,15 @@ else if(in_array($request, $private_uri)){
                 break;
             case '/rent/return':
                 RentController::returnBook($userID);
+                break;
+            case '/fav/add':
+                FavsController::addFavBook($userID);
+                break;
+            case '/fav/remove':
+                FavsController::removeFavBook($userID);
+                break;
+            case '/fav/get':
+                FavsController::getFavBooks($userID);
                 break;
             }
     }
