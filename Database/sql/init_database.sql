@@ -122,7 +122,7 @@ VALUES(
     0,
     0,
     0,
-    'fatansía',
+    'fantasía',
     1
 );
 INSERT INTO books(
@@ -150,7 +150,7 @@ VALUES(
     0,
     0,
     0,
-    'fatansía',
+    'fantasía',
     1
 );
 INSERT INTO books(
@@ -178,7 +178,7 @@ VALUES(
     0,
     0,
     0,
-    'fatansía',
+    'fantasía',
     1
 );
 INSERT INTO books(
@@ -206,7 +206,7 @@ VALUES(
     0,
     0,
     0,
-    'fatansía',
+    'fantasía',
     1
 );
 INSERT INTO books(
@@ -235,7 +235,7 @@ El hombre había desaparecido. El mito no. Músico, mendigo, ladrón, estudiante
     0,
     0,
     0,
-    'fatansía',
+    'fantasía',
     1
 );
 INSERT INTO books(
@@ -265,7 +265,7 @@ En ese laberinto de túneles antiguos, de salas y habitaciones abandonadas, de e
     0,
     0,
     0,
-    'fatansía',
+    'fantasía',
     1
 );
 INSERT INTO books(
@@ -294,7 +294,7 @@ Desde el amanecer a la medianoche, durante el transcurso de un día, seguiremos 
     0,
     0,
     0,
-    'fatansía',
+    'fantasía',
     1
 );
 

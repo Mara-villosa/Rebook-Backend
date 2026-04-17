@@ -1,5 +1,9 @@
 <?php 
 class CORSUtils{
+    /**
+     * Gestiona cabeceras de las peticiones para evitar problemas de CORS
+     * @return void
+     */
     public static function handleCORS(){
         header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Methods: HEAD, GET, POST, PUT, PATCH, DELETE, OPTIONS");

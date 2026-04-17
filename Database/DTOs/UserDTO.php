@@ -45,8 +45,7 @@ class UserDTO{
     }
 
     /**
-     * Devuelve el nombre, apellidos, email, DNI, fecha de nacimiento, localidad, dirección,
-     * código postal y número de teléfono del usuario en formato JSON.
+     * Devuelve los datos del usuario en formato JSON
      * El ID se devuelve codificado en el JWT para no dar información sobre la base de datos
      * @return array{address: string, birthday: string, city: string, email: string, id_document: string, lastname: string, name: string, phone: string, postal_code: string}
      */

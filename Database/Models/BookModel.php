@@ -3,21 +3,6 @@ require_once(ROOT . '/database/databaseConfig.php');
 require_once(ROOT . '/database/DTOs/BookDTO.php');
 class BookModel{
     /**
-     * Devuelve un objeto de conexión a la base de datos MySQLi.
-     * Devuelve null si no se puede conectar.
-     * @param string $server servidor de la base de datos
-     * @param string $database nombre de la base de datos
-     * @param string $user usuario de conexión
-     * @param string $password contraseña de conexión
-     * @return mysqli|null
-     */
-    private function connect(string $server, string $database, string $user, string $password){
-        $mysqli = new mysqli($server, $user, $password, $database);
-        if ($mysqli->connect_error)  return null;
-        return $mysqli;
-    }
-
-    /**
      * Añade un libro nuevo a la base de datos
      * @param string $title
      * @param string $description
@@ -41,7 +26,7 @@ class BookModel{
         int $userID
         ): bool
     {
-        $connection = $this->connect(SERVER, DATABASE, USER, PASSWORD);
+        $connection = DatabaseConfig::connect();
 
         //Se cancela si hay un error de conexión
         if ($connection->error) {
@@ -52,12 +37,12 @@ class BookModel{
         $connection->autocommit(false);
         $connection->begin_transaction();
        
-        $query = $connection->prepare('INSERT INTO books (title, author, description, rent_price, sell_price, isbn, url, category, in_cart, rented, id_user, rent_expired, sold, rent_expiration_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+        $query = $connection->prepare('INSERT INTO books (title, author, description, rent_price, sell_price, isbn, url, category, in_cart, rented, id_user, sold, rent_expiration_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
 
-        $inCart = $rented = $rent_expired = $sold = false;
+        $inCart = $rented = $sold = false;
         $category = strtolower($category);
         $rent_expiration_date = '';
-        $query->bind_param('sssddsssssisss', $title, $author, $description, $rent_price, $sell_price, $isbn, $url, $category, $inCart, $rented, $userID, $rent_expired, $sold, $rent_expiration_date);
+        $query->bind_param('sssddsssssiss', $title, $author, $description, $rent_price, $sell_price, $isbn, $url, $category, $inCart, $rented, $userID, $sold, $rent_expiration_date);
 
         try{
             $query->execute();
@@ -82,7 +67,7 @@ class BookModel{
      * @return bool true si se ha podido borrar
      */
     public function deleteBook(int $book_id){
-        $connection = $this->connect(SERVER, DATABASE, USER, PASSWORD);
+        $connection = DatabaseConfig::connect();
 
         //Se cancela si hay un error de conexión
         if ($connection->error) {
@@ -121,15 +106,15 @@ class BookModel{
      * @returns array | null
      */
     public function getAllBooks(): array|null{
-        $connection = $this->connect(SERVER, DATABASE, USER, PASSWORD);
+        $connection = DatabaseConfig::connect();
         $connection->autocommit(false);
         $connection->begin_transaction();
 
-        $query = $connection->prepare('SELECT * FROM books');
+        $query = $connection->prepare('SELECT * FROM books WHERE books.rented = FALSE AND books.sold = FALSE AND books.in_cart = FALSE');
         $query->execute();
         $query_result = $query->get_result();
 
-        //Si hay un error o no encuentra el usuario, devuelve null
+        //Si hay un error o no encuentra libros, devuelve null
         if ($connection->error || $query_result->num_rows === 0) {
             $query_result->free();
             $connection->rollback();
@@ -152,7 +137,6 @@ class BookModel{
                 $result['in_cart'],
                 $result['rented'], 
                 $result['id_user'],
-                $result['rent_expired'], 
                 $result['sold'],
                 $result['rent_expiration_date']);
 
@@ -173,7 +157,7 @@ class BookModel{
      * @return array|null
      */
     public function getAllBooksFromUser(int $userID){
-        $connection = $this->connect(SERVER, DATABASE, USER, PASSWORD);
+        $connection = DatabaseConfig::connect();
         $connection->autocommit(false);
         $connection->begin_transaction();
 
@@ -186,7 +170,6 @@ class BookModel{
         $query->execute();
         $query_result = $query->get_result();
 
-        //Si hay un error o no encuentra el usuario, devuelve null
         if ($connection->error) {
             $query_result->free();
             $connection->rollback();
@@ -208,7 +191,6 @@ class BookModel{
                 $result['in_cart'],
                 $result['rented'], 
                 $result['id_user'], 
-                $result['rent_expired'], 
                 $result['sold'],
                 $result['rent_expiration_date']);
 
@@ -222,7 +204,6 @@ class BookModel{
         $query->execute();
         $query_result = $query->get_result();
 
-        //Si hay un error o no encuentra el usuario, devuelve null
         if ($connection->error) {
             $query_result->free();
             $connection->rollback();
@@ -244,7 +225,6 @@ class BookModel{
                 $result['in_cart'],
                 $result['rented'], 
                 $result['id_user'], 
-                $result['rent_expired'], 
                 $result['sold'],
                 $result['rent_expiration_date']);
 
@@ -279,7 +259,6 @@ class BookModel{
                 $result['in_cart'],
                 $result['rented'], 
                 $result['id_user'], 
-                $result['rent_expired'], 
                 $result['sold'],
                 $result['rent_expiration_date']);
 
@@ -302,16 +281,16 @@ class BookModel{
      * @param string $category categoría a buscar
      */
     public function getAllBooksByCategory(string $category){
-        $connection = $this->connect(SERVER, DATABASE, USER, PASSWORD);
+        $connection = DatabaseConfig::connect();
         $connection->autocommit(false);
         $connection->begin_transaction();
 
-        $query = $connection->prepare('SELECT * FROM books WHERE category = ?');
+        $query = $connection->prepare('SELECT * FROM books WHERE category = ? AND books.rented = FALSE AND books.sold = FALSE AND books.in_cart = FALSE');
         $query->bind_param('s', $category);
         $query->execute();
         $query_result = $query->get_result();
 
-        //Si hay un error o no encuentra el usuario, devuelve null
+        //Si hay un error o no encuentra libros, devuelve null
         if ($connection->error || $query_result->num_rows === 0) {
             $query_result->free();
             $connection->rollback();
@@ -333,8 +312,7 @@ class BookModel{
                 $result['category'],
                 $result['in_cart'],
                 $result['rented'], 
-                $result['id_user'],
-                $result['rent_expired'], 
+                $result['id_user'], 
                 $result['sold'],
                 $result['rent_expiration_date']);
 
@@ -354,7 +332,7 @@ class BookModel{
      * @param int $book_id id del libro a buscar
      */
     public function getBookDetails(int $book_id){
-        $connection = $this->connect(SERVER, DATABASE, USER, PASSWORD);
+        $connection = DatabaseConfig::connect();
         $connection->autocommit(false);
         $connection->begin_transaction();
 
@@ -363,7 +341,7 @@ class BookModel{
         $query->execute();
         $query_result = $query->get_result();
 
-        //Si hay un error o no encuentra el usuario, devuelve null
+        //Si hay un error o no encuentra el libro, devuelve null
         if ($connection->error || $query_result->num_rows === 0) {
             $query_result->free();
             $connection->rollback();
@@ -392,7 +370,6 @@ class BookModel{
             $result['in_cart'],
             $result['rented'], 
             $result['id_user'],
-            $result['rent_expired'], 
             $result['sold'],
             $result['rent_expiration_date']);
 
