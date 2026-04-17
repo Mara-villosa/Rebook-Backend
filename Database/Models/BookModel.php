@@ -110,7 +110,7 @@ class BookModel{
         $connection->autocommit(false);
         $connection->begin_transaction();
 
-        $query = $connection->prepare('SELECT * FROM books');
+        $query = $connection->prepare('SELECT * FROM books WHERE books.rented = FALSE AND books.sold = FALSE AND books.in_cart = FALSE');
         $query->execute();
         $query_result = $query->get_result();
 
@@ -287,7 +287,7 @@ class BookModel{
         $connection->autocommit(false);
         $connection->begin_transaction();
 
-        $query = $connection->prepare('SELECT * FROM books WHERE category = ?');
+        $query = $connection->prepare('SELECT * FROM books WHERE category = ? AND books.rented = FALSE AND books.sold = FALSE AND books.in_cart = FALSE');
         $query->bind_param('s', $category);
         $query->execute();
         $query_result = $query->get_result();
