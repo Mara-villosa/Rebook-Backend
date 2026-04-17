@@ -49,6 +49,7 @@ CREATE TABLE rented(
 CREATE TABLE favourites(
     id_user INT,
     id_book INT,
+    added_on DATE,
     PRIMARY KEY (id_user, id_book),
     FOREIGN KEY (id_user) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (id_book) REFERENCES books(id) ON DELETE CASCADE
@@ -57,6 +58,7 @@ CREATE TABLE favourites(
 CREATE TABLE carts(
     id_user INT,
     id_book INT,
+    is_rent BOOL,
     PRIMARY KEY (id_user, id_book),
     FOREIGN KEY (id_user) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (id_book) REFERENCES books(id) ON DELETE CASCADE
@@ -65,6 +67,7 @@ CREATE TABLE carts(
 CREATE TABLE bought(
     id_user INT,
     id_book INT,
+    bought_on DATE,
     PRIMARY KEY (id_user, id_book),
     FOREIGN KEY (id_user) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (id_book) REFERENCES books(id) ON DELETE CASCADE
@@ -104,7 +107,6 @@ INSERT INTO books(
     url,
     in_cart,
     rented,
-    rent_expired,
     sold,
     category,
     id_user
@@ -120,7 +122,6 @@ VALUES(
     0,
     0,
     0,
-    0,
     'fatansía',
     1
 );
@@ -134,7 +135,6 @@ INSERT INTO books(
     url,
     in_cart,
     rented,
-    rent_expired,
     sold,
     category,
     id_user
@@ -150,7 +150,6 @@ VALUES(
     0,
     0,
     0,
-    0,
     'fatansía',
     1
 );
@@ -164,7 +163,6 @@ INSERT INTO books(
     url,
     in_cart,
     rented,
-    rent_expired,
     sold,
     category,
     id_user
@@ -180,7 +178,6 @@ VALUES(
     0,
     0,
     0,
-    0,
     'fatansía',
     1
 );
@@ -194,7 +191,6 @@ INSERT INTO books(
     url,
     in_cart,
     rented,
-    rent_expired,
     sold,
     category,
     id_user
@@ -210,7 +206,6 @@ VALUES(
     0,
     0,
     0,
-    0,
     'fatansía',
     1
 );
@@ -224,7 +219,6 @@ INSERT INTO books(
     url,
     in_cart,
     rented,
-    rent_expired,
     sold,
     category,
     id_user
@@ -241,7 +235,6 @@ El hombre había desaparecido. El mito no. Músico, mendigo, ladrón, estudiante
     0,
     0,
     0,
-    0,
     'fatansía',
     1
 );
@@ -255,7 +248,6 @@ INSERT INTO books(
     url,
     in_cart,
     rented,
-    rent_expired,
     sold,
     category,
     id_user
@@ -273,7 +265,6 @@ En ese laberinto de túneles antiguos, de salas y habitaciones abandonadas, de e
     0,
     0,
     0,
-    0,
     'fatansía',
     1
 );
@@ -287,7 +278,6 @@ INSERT INTO books(
     url,
     in_cart,
     rented,
-    rent_expired,
     sold,
     category,
     id_user
@@ -304,7 +294,6 @@ Desde el amanecer a la medianoche, durante el transcurso de un día, seguiremos 
     0,
     0,
     0,
-    0,
     'fatansía',
     1
 );
@@ -319,7 +308,6 @@ INSERT INTO books(
     url,
     in_cart,
     rented,
-    rent_expired,
     sold,
     category,
     id_user
@@ -335,7 +323,6 @@ VALUES(
     0,
     0,
     0,
-    0,
     'thriller',
     1
 );
@@ -349,7 +336,6 @@ INSERT INTO books(
     url,
     in_cart,
     rented,
-    rent_expired,
     sold,
     category,
     id_user
@@ -365,7 +351,6 @@ VALUES(
     0,
     0,
     0,
-    0,
     'thriller',
     1
 );
@@ -379,7 +364,6 @@ INSERT INTO books(
     url,
     in_cart,
     rented,
-    rent_expired,
     sold,
     category,
     id_user
@@ -395,7 +379,6 @@ VALUES(
     0,
     0,
     0,
-    0,
     'thriller',
     1
 );
@@ -409,7 +392,6 @@ INSERT INTO books(
     url,
     in_cart,
     rented,
-    rent_expired,
     sold,
     category,
     id_user
@@ -425,7 +407,6 @@ VALUES(
     0,
     0,
     0,
-    0,
     'thriller',
     1
 );
@@ -439,7 +420,6 @@ INSERT INTO books(
     url,
     in_cart,
     rented,
-    rent_expired,
     sold,
     category,
     id_user
@@ -452,7 +432,6 @@ VALUES(
     15,
     '9788401337208',
     'https://imagessl7.casadellibro.com/a/l/s7/37/9788467081237.webp',
-    0,
     0,
     0,
     0,
@@ -470,7 +449,6 @@ INSERT INTO books(
     url,
     in_cart,
     rented,
-    rent_expired,
     sold,
     category,
     id_user
@@ -486,7 +464,6 @@ VALUES(
     0,
     0,
     0,
-    0,
     'terror',
     1
 );
@@ -500,7 +477,6 @@ INSERT INTO books(
     url,
     in_cart,
     rented,
-    rent_expired,
     sold,
     category,
     id_user
@@ -516,7 +492,6 @@ VALUES(
     0,
     0,
     0,
-    0,
     'terror',
     1
 );
@@ -530,7 +505,6 @@ INSERT INTO books(
     url,
     in_cart,
     rented,
-    rent_expired,
     sold,
     category,
     id_user
@@ -546,7 +520,6 @@ VALUES(
     0,
     0,
     0,
-    0,
     'terror',
     1
 );
@@ -560,7 +533,6 @@ INSERT INTO books(
     url,
     in_cart,
     rented,
-    rent_expired,
     sold,
     category,
     id_user
@@ -576,7 +548,6 @@ VALUES(
     0,
     0,
     0,
-    0,
     'terror',
     1
 );
@@ -590,7 +561,6 @@ INSERT INTO books(
     url,
     in_cart,
     rented,
-    rent_expired,
     sold,
     category,
     id_user
@@ -606,7 +576,6 @@ VALUES(
     0,
     0,
     0,
-    0,
     'terror',
     1
 );
@@ -620,7 +589,6 @@ INSERT INTO books(
     url,
     in_cart,
     rented,
-    rent_expired,
     sold,
     category,
     id_user
@@ -639,7 +607,6 @@ Pero su padre necesitaba aquel trabajo en el hotel. Danny sabía que su madre pe
     0,
     0,
     0,
-    0,
     'terror',
     1
 );
@@ -654,7 +621,6 @@ INSERT INTO books(
     url,
     in_cart,
     rented,
-    rent_expired,
     sold,
     category,
     id_user
@@ -670,7 +636,6 @@ VALUES(
     0,
     0,
     0,
-    0,
     'ciencia ficción',
     1
 );
@@ -684,7 +649,6 @@ INSERT INTO books(
     url,
     in_cart,
     rented,
-    rent_expired,
     sold,
     category,
     id_user
@@ -700,7 +664,6 @@ VALUES(
     0,
     0,
     0,
-    0,
     'ciencia ficción',
     1
 );
@@ -714,7 +677,6 @@ INSERT INTO books(
     url,
     in_cart,
     rented,
-    rent_expired,
     sold,
     category,
     id_user
@@ -731,7 +693,6 @@ Y en este planeta, centro de las intrigas de una corrupta clase política y some
     0,
     0,
     0,
-    0,
     'ciencia ficción',
     1
 );
@@ -745,7 +706,6 @@ INSERT INTO books(
     url,
     in_cart,
     rented,
-    rent_expired,
     sold,
     category,
     id_user
@@ -761,7 +721,6 @@ VALUES(
     0,
     0,
     0,
-    0,
     'ciencia ficción',
     1
 );
@@ -775,7 +734,6 @@ INSERT INTO books(
     url,
     in_cart,
     rented,
-    rent_expired,
     sold,
     category,
     id_user
@@ -791,7 +749,6 @@ VALUES(
     0,
     0,
     0,
-    0,
     'ciencia ficción',
     1
 );
@@ -805,7 +762,6 @@ INSERT INTO books(
     url,
     in_cart,
     rented,
-    rent_expired,
     sold,
     category,
     id_user
@@ -819,7 +775,6 @@ La unión de Duncan Idaho y Murbella, cautivos ambos en la no-nave, puede arroja
     15,
     '9788401337208',
     'https://imagessl0.casadellibro.com/a/l/s7/50/9788466359450.webp',
-    0,
     0,
     0,
     0,
