@@ -262,5 +262,47 @@ class UserModel{
     private function updateField($connection, $userId, $fieldName, $field): bool{
         return $connection->query('UPDATE users set ' . $fieldName . ' = ' . '\''. $field . '\'' .' WHERE id = ' . $userId);
     }
+
+    public function getUserData(int $userID){
+        $connection = DatabaseConfig::connect();
+        $connection->autocommit(false);
+        $connection->begin_transaction();
+
+        $query = $connection->prepare('SELECT * FROM users WHERE id = ?');
+        $query->bind_param('s', $userID);
+        $query->execute();
+        $query_result = $query->get_result();
+
+        //Si hay un error o no encuentra el usuario, devuelve null
+        if ($connection->error || $query_result->num_rows === 0) {
+            $query_result->free();
+            $connection->rollback();
+            $connection->autocommit(true);
+            return null;
+        }
+
+        $result = $query_result->fetch_assoc();
+
+        //Se devuelven los datos del usuario
+        $user = new UserDTO(
+            $result['id'],
+            $result['name'],
+            $result['email'],
+            $result['lastname'],
+            $result['id_document'],
+            $result['birthday'],
+            $result['city'],
+            $result['address'],
+            $result['postal_code'],
+            $result['phone'],
+        );
+
+        $query_result->free();
+        $connection->commit();
+        $connection->autocommit(true);
+        $connection->close();
+
+        return $user;
+    }
 }
 ?>

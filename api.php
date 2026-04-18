@@ -24,7 +24,7 @@ $public_uri = array(
 
 //Necesitan una cabecera Authorization: Bearer JWT válida
 $private_uri = array(
-"/user", 
+"/user/update", "/user/get", 
 "/books/new", "/books/delete", "/books/getFromUser", 
 "/rent", "/rent/check", "/rent/extend", "/rent/get", "/rent/return", 
 "/fav/add", "/fav/remove", "/fav/get",
@@ -65,7 +65,10 @@ else if(in_array($request, $private_uri)){
         $userID = HeaderUtils::getUserID();
         switch($request){
             //User endpoints
-            case '/user': 
+            case '/user/get':
+                UsersController::getUserData($userID);
+                break;
+            case '/user/update': 
                 UsersController::patchUser($userID);
                 break;
             //Book endpoints

@@ -50,7 +50,7 @@ class UserDTO{
      * @return array{address: string, birthday: string, city: string, email: string, id_document: string, lastname: string, name: string, phone: string, postal_code: string}
      */
     public function jsonSerialize(){
-        return [
+        $json = [
             'name' => $this->name,
             'email' => $this->email,
             'lastname' => $this->lastname,
@@ -61,6 +61,7 @@ class UserDTO{
             'postal_code' => $this->postal_code,
             'phone' => $this->phone            
         ];
+        return $json;
     }
 }
 ?>

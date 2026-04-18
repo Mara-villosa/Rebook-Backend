@@ -172,5 +172,17 @@ class UsersController{
             returnHTTPError('Invalid user update data', 400);
         }
     }
+
+    public static function getUserData(int $userID){
+        $model = new UserModel();
+        $userData = $model->getUserData($userID);
+
+        if(!isset($userData)) returnHTTPError('Invalid user', 400);
+
+        http_response_code(200);
+        $response = array('user' => $userData->jsonSerialize());
+        echo json_encode($response);
+        exit;
+    }
 }
 ?>
