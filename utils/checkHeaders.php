@@ -10,12 +10,12 @@ class HeaderUtils{
      * @return bool true si la cabecera es válida
      */
     public static function checkValidPublicAPICall(): bool{
-        foreach (getallheaders() as $name => $value) {
-            if($name === 'x-api-key' && $value === HeaderUtils::api_key){
-                return true;
-            }
-        }
-        return false;
+        $headers = getallheaders();
+        $xApiKey = $headers['x-api-key'] ?? $headers['X-API-KEY'];
+
+        if(!isset($xApiKey)) return false;
+
+        return $xApiKey === HeaderUtils::api_key;
     }
 
     /**
@@ -24,16 +24,15 @@ class HeaderUtils{
      * @return bool true si la cabecera es válida
      */
     public static function checkValidPrivateAPICall(): bool{
-        foreach (getallheaders() as $name => $value) {
-            if($name === 'Authorization'){
-                //La cabecera tiene formato 'Bearer tokenJWT'
-                //Se separa el tokenJWT y se comprueba su validez
-                $token = explode(' ', $value)[1];
+        $headers = getallheaders();
+        $authHeader = $headers['Authorization'] ?? $headers['authorization'];
 
-                return JWTUtils::checkValidToken($token);
-            }
-        }
-        return false;
+        if(!isset($authHeader)) return false;
+
+        if(!str_starts_with($authHeader, 'Bearer ')) return false;
+
+        $token = substr($authHeader, 7);
+        return JWTUtils::checkValidToken($token);
     }
     /**
      * Devuelve el ID del usuario extraído del JWT de la cabecera Authorization
