@@ -11,6 +11,8 @@ class HeaderUtils{
      */
     public static function checkValidPublicAPICall(): bool{
         $headers = getallheaders();
+        if(!isset($headers['x-api-key'])) return false;
+        
         $xApiKey = $headers['x-api-key'] ?? $headers['X-API-KEY'];
 
         if(!isset($xApiKey)) return false;
@@ -25,6 +27,8 @@ class HeaderUtils{
      */
     public static function checkValidPrivateAPICall(): bool{
         $headers = getallheaders();
+        if(!isset($headers['Authorization'])) return false;
+
         $authHeader = $headers['Authorization'] ?? $headers['authorization'];
 
         if(!isset($authHeader)) return false;
