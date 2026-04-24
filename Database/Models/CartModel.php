@@ -76,6 +76,24 @@ class CartModel{
             return 'Error adding book to cart';
         }
 
+        if($renting){
+            $query = $connection->prepare('UPDATE books SET rent_expiration_date = ? WHERE books.id = ?');
+
+            $currentDate = date('Y-m-d');
+            $enddate = strtotime("+2 weeks", strtotime($currentDate));
+            $expirationDate = date('Y-m-d', $enddate);
+
+            $query->bind_param('si', $expirationDate, $bookID);
+            $query->execute();
+
+            //Si hay un error o no ha actualizado el libro, devuelve false
+            if ($connection->error || $query->affected_rows === 0) {
+                $connection->rollback();
+                $connection->autocommit(true);
+                return 'Error adding book to cart';
+            }
+        }
+
         $query_result->free();
         $connection->commit();
         $connection->autocommit(true);
