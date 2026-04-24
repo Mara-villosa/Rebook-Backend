@@ -126,8 +126,9 @@ class CartModel{
         }
 
         //Actualizar datos del libro
-        $query = $connection->prepare('UPDATE books SET in_cart = FALSE WHERE books.id = ?');
-        $query->bind_param('i', $bookID);
+        $query = $connection->prepare('UPDATE books SET in_cart = FALSE, rent_expiration_date = ? WHERE books.id = ?');
+        $expiration_date = '';
+        $query->bind_param('si', $expiration_date, $bookID);
         $query->execute();
 
         //Si hay un error o no ha actualizado el libro devuelve false
